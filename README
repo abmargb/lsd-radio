@@ -1,0 +1,6 @@
+*LSD Radio*
+
+Diretórios:
+
+-ices_py: Extensão python para o ices_0.4
+-server: Aplicação Flask, que serve o player e o formulário de voto
