@@ -21,4 +21,4 @@ if __name__ == "__main__":
     for i in range(0, to_process) :
         vote_id = utils.poll(real_path('to_process_votes'))
         if (vote_id) :
-            process_audio(FFMPEG_LINE, vote_id, utils, real_path)
+            process_audio(vote_id)
