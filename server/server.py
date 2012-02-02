@@ -16,7 +16,7 @@ def vote():
     
     vote = request.form["vote"]
     
-    params = urllib.urlencode({'q': vote, 'max-results': '1', 'v': '2', 'alt': 'jsonc'})
+    params = urllib.urlencode({'q': vote.encode('utf-8'), 'max-results': '1', 'v': '2', 'alt': 'jsonc'})
     
     url = "http://gdata.youtube.com/feeds/api/videos?%s" % params
     result = simplejson.load(urllib.urlopen(url))
