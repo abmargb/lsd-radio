@@ -1,0 +1,62 @@
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<link href="static/style.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="static/js/jquery-1.7.1.min.js"></script> 
+    <script type="text/javascript" src="static/js/jquery.form.js"></script> 
+	
+	<script type="text/javascript">
+
+		function ffmp3Callback(event,value){
+    		//alert('event: "'+event+'", value: "'+value+'"');
+		}
+	
+		$(document).ready(function() { 
+            // bind 'myForm' and provide a simple callback function 
+            $('#vote-form-inner').ajaxForm(function() { 
+                alert("A Rádio LSD agradece sua sugestão!");
+                $('#vote-form-inner').clearForm();
+            }); 
+        }); 
+        	
+	</script>
+	
+	<title>LSD Radio - Fazendo sua cabeça</title>
+	
+</head>
+
+<body>
+
+	<div id="header" class="container clearfix">
+		<img src="static/header2.png">
+	</div>
+
+	<div id="main" class="container cleafix">
+	
+		<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="329" height="21" bgcolor="#FFFFFF">
+		<param name="movie" value="static/ffmp3.swf" />
+		<param name="flashvars" value="url=http://{{server_url}}/ices&lang=en&codec=mp3&volume=100&traking=true&jsevents=true&autoplay=true&buffering=5&title=LSD+Radio" />
+		<param name="wmode" value="window" />
+		<param name="allowscriptaccess" value="always" />
+		<param name="scale" value="noscale" />
+		<embed src="static/ffmp3.swf" flashvars="url=http://{{server_url}}/ices&lang=en&codec=mp3&volume=100&traking=true&jsevents=true&autoplay=true&buffering=5&title=LSD+Radio" width="329" scale="noscale" height="21" wmode="window" bgcolor="#FFFFFF" allowscriptaccess="always" type="application/x-shockwave-flash" />
+		</object>
+	
+		<div id="vote-form" class="clearfix">
+		<form id="vote-form-inner" action="vote" method="post">
+			<label>Sugere uma música</label> 
+			<input name="vote" type="text"/>
+			<button type="submit">Vai!</button>
+		</form>
+		</div>
+	</div>
+	
+	<div id="footer" class="container clearfix">
+		<img src="static/lsd-ink.png">
+	</div>
+	
+
+</body>
+
+</html>

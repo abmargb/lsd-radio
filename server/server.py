@@ -3,31 +3,26 @@ import logging
 import simplejson, urllib
 import os
 import utils
-from config import RADIO_ROOT
+from config import RADIO_ROOT, SERVER_URL
 
 app = Flask(__name__)
 
-@app.route('/vote', methods=["GET", "POST"])
+@app.route('/vote', methods=["POST"])
 def vote():
-    if request.method == "POST" :
-        
-        vote = request.form["vote"]
-        
-        url = "http://gdata.youtube.com/feeds/api/videos?q=%s&max-results=1&v=2&alt=jsonc" % urllib.quote_plus(vote)
-        result = simplejson.load(urllib.urlopen(url))
-        video_id = result['data']['items'][0]['id']
-        
-        utils.append(utils.get_path(RADIO_ROOT, 'to_process_votes'), video_id)
-        
-    return render_template("vote.html")
-
-@app.route('/player')
-def player():
-    return render_template("player.html")
+    
+    vote = request.form["vote"]
+    
+    url = "http://gdata.youtube.com/feeds/api/videos?q=%s&max-results=1&v=2&alt=jsonc" % urllib.quote_plus(vote)
+    result = simplejson.load(urllib.urlopen(url))
+    video_id = result['data']['items'][0]['id']
+    
+    utils.append(utils.get_path(RADIO_ROOT, 'to_process_votes'), video_id)
+    
+    return 'OK'
 
 @app.route('/')
 def index():
-    return redirect(url_for("vote"))
+    return render_template("index.html", server_url=SERVER_URL)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, format='%(levelname)-8s %(message)s')

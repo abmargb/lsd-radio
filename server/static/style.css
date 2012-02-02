@@ -1,0 +1,81 @@
+/* CSS Document */
+
+body {
+	margin:0px;
+	font-family:Helvetica, Arial, sans-serif;
+	font-size:12px;
+}
+
+.clearfix {
+	display: block;
+}
+
+.container {
+	position:relative;
+	width: 1000px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align:left;
+}
+
+#header {
+	text-align: center;
+}
+
+#main {
+	margin-top: 100px;
+	text-align: center;
+}
+
+#vote-form {
+	text-align:center;
+	position:relative;
+	margin-top: 100px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 100px;
+	width: 400px;
+}
+
+#vote-form label{
+	text-align:center;
+	font-size: 40px;
+	color: black;
+}
+
+#vote-form input {
+	width: 400px;
+	padding: 5px;
+	font-size: 30px;
+	text-align: center;
+	text-shadow: 0px 1px 0px #fff;
+	outline: none;
+	background: -webkit-gradient(linear, left top, left bottom, from(#bcbcbe), to(#ffffff));
+	background: -moz-linear-gradient(top,  #bcbcbe,  #ffffff);
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	border: 1px solid #717171;
+}
+
+#vote-form input:focus {
+	-webkit-box-shadow: 0px 0px 5px #dd137d;
+	-moz-box-shadow: 0px 0px 5px #dd137d;
+	box-shadow: 0px 0px 5px #dd137d;
+}
+
+#vote-form button {
+	width:125px;
+	height:35px;
+	color:#333333;
+	font-size:11px;
+	font-weight:bold;
+	margin-top: 10px;
+	font-size: large;
+}
+
+#footer {
+	margin: 0px auto;
+	padding: 20px 0px;
+	text-align: center;
+}
