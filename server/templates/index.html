@@ -12,14 +12,25 @@
     		//alert('event: "'+event+'", value: "'+value+'"');
 		}
 	
-		$(document).ready(function() { 
+		$(document).ready(function() {
+		
+			var options = { 
+    			success: function() { 
+        			alert("A Rádio LSD agradece sua sugestão!");
+                	$('#form-submit').removeAttr('disabled');
+                	$('#vote-form-inner').clearForm();
+    			},
+    			
+    			beforeSubmit: function() { 
+        			$('#form-submit').attr('disabled','disabled'); 
+    			}
+			};
+			
             // bind 'myForm' and provide a simple callback function 
-            $('#vote-form-inner').ajaxForm(function() { 
-                alert("A Rádio LSD agradece sua sugestão!");
-                $('#vote-form-inner').clearForm();
-            }); 
-        }); 
-        	
+            $('#vote-form-inner').ajaxForm(options);
+            
+        });
+        
 	</script>
 	
 	<title>LSD Radio - Fazendo sua cabeça</title>
@@ -47,7 +58,7 @@
 		<form id="vote-form-inner" action="vote" method="post">
 			<label>Sugere uma música</label> 
 			<input name="vote" type="text"/>
-			<button type="submit">Vai!</button>
+			<button type="submit" id="form-submit">Vai!</button>
 		</form>
 		</div>
 	</div>

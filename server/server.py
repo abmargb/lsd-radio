@@ -22,7 +22,7 @@ def vote():
     result = simplejson.load(urllib.urlopen(url))
     video_id = result['data']['items'][0]['id']
     
-    utils.append(utils.get_path(RADIO_ROOT, 'to_process_votes'), video_id)
+    #utils.append(utils.get_path(RADIO_ROOT, 'to_process_votes'), video_id)
     
     return 'OK'
 
