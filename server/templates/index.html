@@ -12,11 +12,26 @@
     		//alert('event: "'+event+'", value: "'+value+'"');
 		}
 	
+		function unlike() {
+			$.ajax({
+  				url: "/unlike",
+ 				success: function(){
+    				//deactivate button
+  				}
+			});
+		}
+	
 		$(document).ready(function() {
 		
 			var options = { 
     			success: function() { 
         			alert("A Rádio LSD agradece sua sugestão!");
+                	$('#form-submit').removeAttr('disabled');
+                	$('#vote-form-inner').clearForm();
+    			},
+    			
+    			error: function() { 
+        			alert("Voto não computado por problemas técnicos :(");
                 	$('#form-submit').removeAttr('disabled');
                 	$('#vote-form-inner').clearForm();
     			},
@@ -40,19 +55,32 @@
 <body>
 
 	<div id="header" class="container clearfix">
-		<img src="static/header2.png">
+		<img src="static/img/header2.png">
 	</div>
 
 	<div id="main" class="container cleafix">
 	
+		<div id=player>
 		<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="329" height="21" bgcolor="#FFFFFF">
-		<param name="movie" value="static/ffmp3.swf" />
-		<param name="flashvars" value="url=http://{{server_url}}/ices&lang=en&codec=mp3&volume=100&traking=true&jsevents=true&autoplay=true&buffering=5&title=LSD+Radio" />
-		<param name="wmode" value="window" />
-		<param name="allowscriptaccess" value="always" />
-		<param name="scale" value="noscale" />
-		<embed src="static/ffmp3.swf" flashvars="url=http://{{server_url}}/ices&lang=en&codec=mp3&volume=100&traking=true&jsevents=true&autoplay=true&buffering=5&title=LSD+Radio" width="329" scale="noscale" height="21" wmode="window" bgcolor="#FFFFFF" allowscriptaccess="always" type="application/x-shockwave-flash" />
+			<param name="movie" value="static/ffmp3.swf" />
+			<param name="flashvars" value="url=http://{{server_url}}/ices&lang=en&codec=mp3&volume=100&traking=true&jsevents=true&autoplay=true&buffering=5&title=LSD+Radio" />
+			<param name="wmode" value="window" />
+			<param name="allowscriptaccess" value="always" />
+			<param name="scale" value="noscale" />
+			<embed src="static/ffmp3.swf" flashvars="url=http://{{server_url}}/ices&lang=en&codec=mp3&volume=100&traking=true&jsevents=true&autoplay=true&buffering=5&title=LSD+Radio" width="329" scale="noscale" height="21" wmode="window" bgcolor="#FFFFFF" allowscriptaccess="always" type="application/x-shockwave-flash" />
 		</object>
+		</div>
+		
+		<div id="player-toolbar" class="clearfix">
+			<ul>
+				
+				<li><a id="unlike-button" href="javascript:void(0)" onClick="unlike();">
+					<img src="static/img/dislike_48.png">
+				</a></li>
+				
+				<li><img src="static/img/like_48.png"></li>				
+			</ul>
+		</div>
 	
 		<div id="vote-form" class="clearfix">
 		<form id="vote-form-inner" action="vote" method="post">
@@ -64,7 +92,7 @@
 	</div>
 	
 	<div id="footer" class="container clearfix">
-		<img src="static/lsd-ink.png">
+		<img src="static/img/lsd-ink.png">
 	</div>
 	
 

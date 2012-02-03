@@ -6,6 +6,11 @@ body {
 	font-size:12px;
 }
 
+a {
+	border: none;
+	text-decoration: none;
+}
+
 .clearfix {
 	display: block;
 }
@@ -15,7 +20,7 @@ body {
 	width: 1000px;
 	margin-left: auto;
 	margin-right: auto;
-	text-align:left;
+	text-align:center;
 }
 
 #header {
@@ -25,6 +30,22 @@ body {
 #main {
 	margin-top: 100px;
 	text-align: center;
+}
+
+#player-toolbar {
+	margin-top: 10px;
+}
+
+#player-toolbar ul {
+	list-style: none;
+	margin: 0px;
+	padding-left: 0px;
+}
+
+#player-toolbar li {
+	list-style-type: none;
+	display: inline;
+	margin: 0;	
 }
 
 #vote-form {
