@@ -9,7 +9,7 @@ def ices_get_next():
         file_path = scratch_queue.get_next()
     
     pipe = open(ICES_PIPE, 'w')
-    pipe.write(1)
+    pipe.write('1')
     pipe.close()
     
     return file_path

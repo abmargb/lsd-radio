@@ -28,7 +28,7 @@ a {
 }
 
 #main {
-	margin-top: 100px;
+	margin-top: 50px;
 	text-align: center;
 }
 
@@ -99,4 +99,59 @@ a {
 	margin: 0px auto;
 	padding: 20px 0px;
 	text-align: center;
+}
+
+#footer a {
+	display: inline-table;
+	padding: 10px;
+}
+
+#lsd-logo:hover {
+    background-image: url('img/lsd.png');
+}
+
+#lsd-logo {
+    background-image: url('img/lsd_g.png');
+    width:108px;
+    height:73px;
+}
+
+#beefs-logo:hover {
+    background-image: url('img/beefs.png');
+}
+
+#beefs-logo {
+    background-image: url('img/beefs_g.png');
+    width:95px;
+    height:73px;
+}
+
+#github-logo:hover {
+    background-image: url('img/github_logo.png');
+}
+
+#github-logo {
+    background-image: url('img/github_logo_g.png');
+    width:73px;
+    height:73px;
+}
+
+#acapela-logo:hover {
+    background-image: url('img/acapela.png');
+}
+
+#acapela-logo {
+    background-image: url('img/acapela_g.png');
+    width:85px;
+    height:73px;
+}
+
+#icecast-logo:hover {
+    background-image: url('img/icecast.png');
+}
+
+#icecast-logo {
+    background-image: url('img/icecast_g.png');
+    width:70px;
+    height:73px;
 }

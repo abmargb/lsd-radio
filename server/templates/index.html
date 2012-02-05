@@ -12,13 +12,72 @@
     		//alert('event: "'+event+'", value: "'+value+'"');
 		}
 	
+		function disableLikeButtons() {
+			$('#unlike-button').removeAttr('onClick', '');
+ 			$('#unlike-button').removeAttr('href', '');
+    		$('#like-button').removeAttr('onClick', '');
+ 			$('#like-button').removeAttr('href', '');
+		}
+		
+		function enableLikeButtons() {
+			$('#unlike-button').attr('onClick', 'unlike();');
+ 			$('#unlike-button').attr('href', 'javascript:void(0)');
+    		$('#like-button').attr('onClick', 'like();');
+ 			$('#like-button').attr('href', 'javascript:void(0)');
+ 			
+ 			$('#unlike-button-img').attr('src', 'static/img/dislike_48.png');
+ 			$('#like-button-img').attr('src', 'static/img/like_48.png');
+		}
+		
 		function unlike() {
+ 			disableLikeButtons()
+			$('#unlike-button-img').attr('src', 'static/img/dislike_d_48.png');
 			$.ajax({
   				url: "/unlike",
- 				success: function(){
-    				//deactivate button
+ 				success: function(jqXHR){
+ 					updateSatisfactionSmiley(jqXHR)
+    				$('#unlike-button-img').attr('src', 'static/img/dislike_red_48.png');
   				}
 			});
+		}
+	
+		function like() {
+			$('#like-button-img').attr('src', 'static/img/like_d_48.png');
+    		disableLikeButtons()
+			$.ajax({
+  				url: "/like",
+ 				success: function(jqXHR){
+ 					updateSatisfactionSmiley(jqXHR)
+    				$('#like-button-img').attr('src', 'static/img/like_green_48.png');
+  				}
+			});
+		}
+		
+		function updateSatisfactionSmiley(satisfaction) {
+		
+			var iconUrlIdx;
+			
+			if (satisfaction < 0.3) {
+				iconUrlIdx = "0"
+			} else if (satisfaction < 0.4) {
+				iconUrlIdx = "1"
+			} else if (satisfaction < 0.5) {
+				iconUrlIdx = "2"
+			} else if (satisfaction == 0.5) {
+				iconUrlIdx = "3"
+			} else if (satisfaction < 0.65) {
+				iconUrlIdx = "4"
+			} else if (satisfaction < 0.8) {
+				iconUrlIdx = "5"
+			} else {
+			    iconUrlIdx = "6"
+			}
+			
+			$('#player-smiley-img').attr('src', 'static/img/s_' + iconUrlIdx + '_48.png');
+		}
+		
+		function updateCurrentSong(song) {
+			$('#current-song').html(song);
 		}
 	
 		$(document).ready(function() {
@@ -31,7 +90,7 @@
     			},
     			
     			error: function() { 
-        			alert("Voto não computado por problemas técnicos :(");
+        			alert("Sugestão não computada por problemas técnicos :(");
                 	$('#form-submit').removeAttr('disabled');
                 	$('#vote-form-inner').clearForm();
     			},
@@ -43,7 +102,17 @@
 			
             // bind 'myForm' and provide a simple callback function 
             $('#vote-form-inner').ajaxForm(options);
-            
+           	
+           	var updater = new Worker('static/js/updater.js');
+           	updater.onmessage = function (event) {
+     			var data = jQuery.parseJSON(event.data);
+     			if (data.vote == 'none') {
+     				enableLikeButtons()
+     			}
+     			updateSatisfactionSmiley(data.satisfaction);
+     			updateCurrentSong(data.current_song);
+   			};
+           	
         });
         
 	</script>
@@ -60,7 +129,9 @@
 
 	<div id="main" class="container cleafix">
 	
-		<div id=player>
+		<h2>Tocando agora: <div style="display: inline; height: 22px;" id="current-song"/></h2>
+	
+		<div id="player">
 		<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="329" height="21" bgcolor="#FFFFFF">
 			<param name="movie" value="static/ffmp3.swf" />
 			<param name="flashvars" value="url=http://{{server_url}}/ices&lang=en&codec=mp3&volume=100&traking=true&jsevents=true&autoplay=true&buffering=5&title=LSD+Radio" />
@@ -74,25 +145,35 @@
 		<div id="player-toolbar" class="clearfix">
 			<ul>
 				
-				<li><a id="unlike-button" href="javascript:void(0)" onClick="unlike();">
-					<img src="static/img/dislike_48.png">
+				<li><a id="unlike-button" {% if vote == 'none' %} href="javascript:void(0)" onClick="unlike();" {% endif %}>
+					<img id="unlike-button-img" src="static/img/dislike_{% if vote == 'unlike' %}red_{% endif %}48.png">
 				</a></li>
 				
-				<li><img src="static/img/like_48.png"></li>				
+				<li><img id="player-smiley-img" src="static/img/s_3_48.png"></li>
+				
+				<li><a id="like-button" {% if vote == 'none' %} href="javascript:void(0)" onClick="like();" {% endif %}>
+					<img id="like-button-img" src="static/img/like_{% if vote == 'like' %}green_{% endif %}48.png">
+				</a></li>
+				
 			</ul>
 		</div>
 	
 		<div id="vote-form" class="clearfix">
 		<form id="vote-form-inner" action="vote" method="post">
-			<label>Sugere uma música</label> 
+			<label>Sugira uma música</label> 
 			<input name="vote" type="text"/>
 			<button type="submit" id="form-submit">Vai!</button>
 		</form>
 		</div>
 	</div>
 	
-	<div id="footer" class="container clearfix">
-		<img src="static/img/lsd-ink.png">
+	<div id="footer" class="container">
+			<h2>Powered by:</h2>
+			<a href="http://lsd.ufcg.edu.br" target="blank"><div id="lsd-logo"></div></a>
+			<a href="http://beefs.lsd.ufcg.edu.br" target="blank"><div id="beefs-logo"></div></a>
+			<a href="https://github.com/abmargb/lsd-radio" target="blank"><div id="github-logo"></div></a>
+			<a href="http://www.acapela-vaas.com/" target="blank"><div id="acapela-logo"></div></a>
+			<a href="http://www.icecast.org/" target="blank"><div id="icecast-logo"></div></a>
 	</div>
 	
 

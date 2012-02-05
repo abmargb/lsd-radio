@@ -14,6 +14,7 @@ def process(videos_no):
 def get_next():
     
     file_path = utils.poll(real_path('processed_votes'))
+    
     lines_processed = utils.lines(real_path('processed_votes'))
     lines_processing = utils.lines(real_path('processing_votes'))
     
