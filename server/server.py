@@ -6,6 +6,7 @@ import os
 import utils
 import string
 import random
+import time
 
 from config import RADIO_ROOT, SERVER_URL, ICES_PID, STATUS_PAGE, ICES_PIPE
 from xml.dom import minidom
@@ -130,8 +131,10 @@ def check_newsong():
     while (True):
         f = open(ICES_PIPE, 'r')
         f.read()
-        update_song()
         f.close()
+        
+        time.sleep(2)
+        update_song()
 
 if __name__ == '__main__':
     

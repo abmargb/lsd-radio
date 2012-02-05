@@ -155,3 +155,13 @@ a {
     width:70px;
     height:73px;
 }
+
+#html5-logo:hover {
+    background-image: url('img/html5.png');
+}
+
+#html5-logo {
+    background-image: url('img/html5_g.png');
+    width:73px;
+    height:73px;
+}
