@@ -22,19 +22,23 @@ PLAYING_IDX = 16
 @app.route('/vote', methods=["POST"])
 def vote():
     
-    vote = request.form["vote"]
+    vote_input = request.form["vote"]
     
-    params = urllib.urlencode({'q': vote.encode('utf-8'), 'max-results': '1', 'v': '2', 'alt': 'jsonc'})
+    votes = vote_input.split(";")
     
-    url = "http://gdata.youtube.com/feeds/api/videos?%s" % params
-    result = simplejson.load(urllib.urlopen(url))
-    item = result['data']['items'][0]
+    for vote in votes:
     
-    video_json = simplejson.dumps({"id": item['id'], "title": item['title']})
+        params = urllib.urlencode({'q': vote.encode('utf-8'), 'max-results': '1', 'v': '2', 'alt': 'jsonc'})
+        
+        url = "http://gdata.youtube.com/feeds/api/videos?%s" % params
+        result = simplejson.load(urllib.urlopen(url))
+        item = result['data']['items'][0]
+        
+        video_json = simplejson.dumps({"id": item['id'], "title": item['title']})
+        
+        utils.append(utils.get_path(RADIO_ROOT, 'to_process_votes'), video_json)
     
-    utils.append(utils.get_path(RADIO_ROOT, 'to_process_votes'), video_json)
-    
-    return current_status['satisfaction']
+    return simplejson.dumps(current_status)
 
 def get_vote(token):
     vote = 'none'
@@ -78,7 +82,7 @@ def like():
         like_votes.append(token)
         update_satisfaction()
         
-    return 'OK'
+    return simplejson.dumps(current_status)
 
 @app.route('/unlike')
 def unlike():
@@ -88,7 +92,7 @@ def unlike():
         unlike_votes.append(token)
         update_satisfaction()
         
-    return 'OK'
+    return simplejson.dumps(current_status)
 
 @app.route('/')
 def index():
@@ -108,7 +112,7 @@ def index():
 def update_song():
     del unlike_votes[0:len(unlike_votes)]
     del like_votes[0:len(like_votes)]
-    current_status['satistaction'] = 0.5
+    current_status['satisfaction'] = 0.5
     update_status()
     
 def update_status():

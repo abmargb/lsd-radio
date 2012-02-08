@@ -4,7 +4,8 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 	<link href="static/style.css" rel="stylesheet" type="text/css" />
 	<script type="text/javascript" src="static/js/jquery-1.7.1.min.js"></script> 
-    <script type="text/javascript" src="static/js/jquery.form.js"></script> 
+    <script type="text/javascript" src="static/js/jquery.form.js"></script>
+    <script type="text/javascript" src="static/js/jquery.autoresize.js"></script>  
 	
 	<script type="text/javascript">
 
@@ -35,7 +36,8 @@
 			$.ajax({
   				url: "/unlike",
  				success: function(jqXHR){
- 					updateSatisfactionSmiley(jqXHR)
+ 					var data = jQuery.parseJSON(jqXHR);
+ 					updateSatisfactionSmiley(data.satisfaction)
     				$('#unlike-button-img').attr('src', 'static/img/dislike_red_48.png');
   				}
 			});
@@ -47,7 +49,8 @@
 			$.ajax({
   				url: "/like",
  				success: function(jqXHR){
- 					updateSatisfactionSmiley(jqXHR)
+ 					var data = jQuery.parseJSON(jqXHR);
+ 					updateSatisfactionSmiley(data.satisfaction)
     				$('#like-button-img').attr('src', 'static/img/like_green_48.png');
   				}
 			});
@@ -112,6 +115,11 @@
      			updateSatisfactionSmiley(data.satisfaction);
      			updateCurrentSong(data.current_song);
    			};
+   			
+   			$('#vote-textarea').autoResize({
+    			maxHeight: 200,
+    			minHeight: 50
+			});
            	
         });
         
@@ -161,7 +169,7 @@
 		<div id="vote-form" class="clearfix">
 		<form id="vote-form-inner" action="vote" method="post">
 			<label>Sugira uma música</label> 
-			<input name="vote" type="text"/>
+			<textarea rows="1" cols="50" name="vote" id="vote-textarea"></textarea>
 			<button type="submit" id="form-submit">Vai!</button>
 		</form>
 		</div>
@@ -170,14 +178,13 @@
 	<div id="footer" class="container">
 			<h2>Powered by:</h2>
 			<a href="http://lsd.ufcg.edu.br" target="blank"><div id="lsd-logo"></div></a>
-			<a href="http://beefs.lsd.ufcg.edu.br" target="blank"><div id="beefs-logo"></div></a>
+			<a href="http://lsd.ufcg.edu.br/beefs" target="blank"><div id="beefs-logo"></div></a>
 			<a href="https://github.com/abmargb/lsd-radio" target="blank"><div id="github-logo"></div></a>
 			<a href="http://www.acapela-vaas.com/" target="blank"><div id="acapela-logo"></div></a>
 			<a href="http://www.icecast.org/" target="blank"><div id="icecast-logo"></div></a>
 			<a href="http://www.w3.org/TR/html5/" target="blank"><div id="html5-logo"></div></a>
 	</div>
 	
-
 </body>
 
 </html>

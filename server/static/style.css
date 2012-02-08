@@ -64,7 +64,7 @@ a {
 	color: black;
 }
 
-#vote-form input {
+#vote-form textarea {
 	width: 400px;
 	padding: 5px;
 	font-size: 30px;
@@ -77,6 +77,7 @@ a {
 	-moz-border-radius: 3px;
 	border-radius: 3px;
 	border: 1px solid #717171;
+	font-family:Helvetica, Arial, sans-serif;
 }
 
 #vote-form input:focus {
