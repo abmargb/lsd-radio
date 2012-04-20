@@ -1,5 +1,10 @@
 #!/usr/bin
 
+if [ `whoami` != root ]; then
+    echo Please run this script as root or using sudo
+    exit
+fi
+
 PWD=`dirname $0`
-sudo ices -c /usr/local/etc/ices.conf.dist &
+ices -c /usr/local/etc/ices.conf.dist > ices.log &
 echo $! > $PWD/ices.pid

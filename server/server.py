@@ -153,5 +153,5 @@ if __name__ == '__main__':
     th.start()
     update_status()
     
-    logging.basicConfig(level=logging.DEBUG, format='%(levelname)-8s %(message)s')
+    logging.basicConfig(level=logging.INFO, format='%(levelname)-8s %(message)s')
     app.run(host='0.0.0.0')
