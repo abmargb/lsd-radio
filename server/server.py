@@ -3,12 +3,12 @@ from threading import Thread
 import logging
 import simplejson, urllib
 import os
-import utils
+import radio_utils
 import string
 import random
 import time
 
-from config import RADIO_ROOT, SERVER_URL, ICES_PID, STATUS_PAGE, ICES_PIPE
+from radio_config import RADIO_ROOT, SERVER_URL, ICES_PID, STATUS_PAGE, ICES_PIPE
 from xml.dom import minidom
 
 app = Flask(__name__)
@@ -36,7 +36,8 @@ def vote():
         
         video_json = simplejson.dumps({"id": item['id'], "title": item['title']})
         
-        utils.append(utils.get_path(RADIO_ROOT, 'to_process_votes'), video_json)
+        radio_utils.append(radio_utils.get_path(RADIO_ROOT, 'to_process_votes'), 
+                           video_json)
     
     return simplejson.dumps(current_status)
 
@@ -127,6 +128,12 @@ def update_status():
         return status_list
     
     status_list = ice_status()
+    
+    if (len(status_list) <= PLAYING_IDX + 1):
+        current_status['song'] = 'Sem musicas pra tocar'
+        current_status['listeners'] = 1
+        return
+    
     current_status['song'] = status_list[PLAYING_IDX]
     current_status['listeners'] = int(status_list[LISTENERS_IDX])
 

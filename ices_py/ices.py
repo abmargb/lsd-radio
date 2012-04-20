@@ -1,6 +1,6 @@
 import os
 import vote_queue, scratch_queue
-from config import ICES_PIPE
+from radio_config import ICES_PIPE
 
 def ices_get_next():
     

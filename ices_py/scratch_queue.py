@@ -2,6 +2,8 @@ import os
 import sys
 import random
 
+from radio_config import SCRATCH_ROOT
+
 def random_track(top_dir):
 
     def random_album(top_dir):
@@ -28,4 +30,7 @@ def random_track(top_dir):
 
 
 def get_next():
-    return random_track('/scratch/mp3')
+    try:
+        return random_track(SCRATCH_ROOT)
+    except: 
+        return None
