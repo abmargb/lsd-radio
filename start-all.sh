@@ -7,5 +7,5 @@ fi
 
 cd `dirname $0`
 /etc/init.d/icecast2 start
-nohup bash start-ices.sh
-nohup bash start-server.sh
+bash start-ices.sh
+bash start-server.sh

@@ -6,5 +6,5 @@ if [ `whoami` != root ]; then
 fi
 
 PWD=`dirname $0`
-ices -c /usr/local/etc/ices.conf.dist > ices.log &
+ices -c /usr/local/etc/ices.conf.dist > ices.log 2>&1 &
 echo $! > $PWD/ices.pid

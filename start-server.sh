@@ -6,5 +6,5 @@ if [ `whoami` != root ]; then
 fi
 
 PWD=`dirname $0`
-python server/server.py > server.log &
+python server/server.py > server.log 2>&1 &
 echo $! > $PWD/server.pid
