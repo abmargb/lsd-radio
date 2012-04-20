@@ -1,6 +1,11 @@
 #!/usr/bin
 # Instalador da Radio LSD
 
+if [ `whoami` != root ]; then
+    echo Please run this script as root or using sudo
+    exit
+fi
+
 cd `dirname $0`
 radio_root=`pwd`
 hostname=`hostname`
