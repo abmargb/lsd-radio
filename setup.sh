@@ -18,7 +18,7 @@ sed -i "s,%RADIO_ROOT%,$radio_root,g" resources/radio_modules.pth
 cp resources/radio_modules.pth $pkg_dir/radio_modules.pth
 
 mkfifo ices_pipe
-touch processed_votes processing_votes to_process_votes
+touch processed_votes processing_votes to_process_votes current_song
 mkdir cache
 
 # Instalando o Flask
