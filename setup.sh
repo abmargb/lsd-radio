@@ -31,7 +31,7 @@ easy_install mutagen
 
 apt-get -y install ffmpeg
 apt-get -y install lame
-apt-get -y install ffmpeg libavcodec-extra-52
+apt-get -y install ffmpeg libavcodec-extra-52 libavcodec-extra-53
 
 # Instalando o icecast2 e o ices
 
