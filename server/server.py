@@ -19,6 +19,16 @@ current_status = {'satisfaction' : 0.5, 'song': '', 'listeners': 0}
 LISTENERS_IDX = 14
 PLAYING_IDX = 16
 
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                    datefmt='%m-%d %H:%M',
+                    filename='/tmp/logs/server.log',
+                    filemode='a')
+
+logger = logging.getLogger('radio')
+
+
 @app.route('/vote', methods=["POST"])
 def vote():
     
@@ -117,7 +127,6 @@ def update_song():
     update_status()
     
 def update_status():
-    
     def ice_status():
         status_xml = urllib.urlopen(STATUS_PAGE).read()
         xml_doc = minidom.parseString(status_xml)
@@ -137,8 +146,7 @@ def update_status():
     current_status['song'] = status_list[PLAYING_IDX]
     current_status['listeners'] = int(status_list[LISTENERS_IDX])
 
-def check_newsong():
-    
+def check_newsong():    
     while (True):
         f = open(ICES_PIPE, 'r')
         f.read()
