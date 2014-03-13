@@ -5,7 +5,9 @@
 	<link href="static/style.css" rel="stylesheet" type="text/css" />
 	<script type="text/javascript" src="static/js/jquery-1.7.1.min.js"></script> 
     <script type="text/javascript" src="static/js/jquery.form.js"></script>
-    <script type="text/javascript" src="static/js/jquery.autoresize.js"></script>  
+    <script type="text/javascript" src="static/js/jquery.autoresize.js"></script>
+    <script type="text/javascript" src="static/js/jquery.leanModal.min.js"></script>
+
 	
 	<script type="text/javascript">
 
@@ -86,10 +88,13 @@
 		$(document).ready(function() {
 		
 			var options = { 
-    			success: function() { 
-        			alert("A Rádio LSD agradece sua sugestão!");
+    			success: function(data) { 
+        			//alert("A Rádio LSD agradece sua sugestão!");
                 	$('#form-submit').removeAttr('disabled');
+                	console.log($("#divTest"))
                 	$('#vote-form-inner').clearForm();
+                	$("#lean_overlay").leanModal();
+
     			},
     			
     			error: function() { 
@@ -167,7 +172,7 @@
 		</div>
 	
 		<div id="vote-form" class="clearfix">
-		<form id="vote-form-inner" action="vote" method="post">
+		<form id="vote-form-inner" action="vote_test" method="post">
 			<label>Sugira uma música</label> 
 			<textarea rows="1" cols="50" name="vote" id="vote-textarea"></textarea>
 			<button type="submit" id="form-submit">Vai!</button>
@@ -184,7 +189,12 @@
 			<a href="http://www.icecast.org/" target="blank"><div id="icecast-logo"></div></a>
 			<a href="http://www.w3.org/TR/html5/" target="blank"><div id="html5-logo"></div></a>
 	</div>
+	</div style:"display:none">
+		<a href="#">Buruffba</a>
+	</div>
 	
 </body>
 
+<div>
+	
 </html>

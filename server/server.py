@@ -26,9 +26,9 @@ logging.basicConfig(level=logging.DEBUG,
                     filename='/tmp/logs/server.log',
                     filemode='a')
 
-logger = logging.getLogger('radio')
+logger = logging.getLogger('radio-server')
 
-
+'''
 @app.route('/vote', methods=["POST"])
 def vote():
     
@@ -43,13 +43,30 @@ def vote():
         url = "http://gdata.youtube.com/feeds/api/videos?%s" % params
         result = simplejson.load(urllib.urlopen(url))
         item = result['data']['items'][0]
-        
+        logger.info(result['data'])
         video_json = simplejson.dumps({"id": item['id'], "title": item['title']})
         
         radio_utils.append(radio_utils.get_path(RADIO_ROOT, 'to_process_votes'), 
                            video_json)
     
     return simplejson.dumps(current_status)
+'''
+@app.route('/vote_test', methods=["POST"])
+def vote_test():
+    logger.info("OK :)")
+    vote = request.form["vote"]
+    params = urllib.urlencode({'q': vote.encode('utf-8'), 'max-results': '10', 'v': '2', 'alt': 'jsonc'})
+    url = "http://gdata.youtube.com/feeds/api/videos?%s" % params
+    result = simplejson.load(urllib.urlopen(url))
+    for item in result["data"]["items"]:
+        logger.info(item["title"])
+    return simplejson.dumps(result)
+
+
+    #params = urllib.urlencode({'q': vote.encode('utf-8'), 'max-results': '1', 'v': '2', 'alt': 'jsonc'})
+    #url = "http://gdata.youtube.com/feeds/api/videos?%s" % params
+    #return simplejson.dumps("")
+
 
 def get_vote(token):
     vote = 'none'
@@ -162,4 +179,4 @@ if __name__ == '__main__':
     update_status()
     
     logging.basicConfig(level=logging.INFO, format='%(levelname)-8s %(message)s')
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=3000, debug=True)
