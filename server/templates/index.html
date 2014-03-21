@@ -6,7 +6,7 @@
 	<script type="text/javascript" src="static/js/jquery-1.7.1.min.js"></script> 
     <script type="text/javascript" src="static/js/jquery.form.js"></script>
     <script type="text/javascript" src="static/js/jquery.autoresize.js"></script>
-    <script type="text/javascript" src="static/js/jquery.leanModal.min.js"></script>
+    <script type="text/javascript" src="static/js/jquery.bpopup.min.js"></script>
 
 	
 	<script type="text/javascript">
@@ -58,6 +58,23 @@
 			});
 		}
 		
+
+		function selectSong() {
+			selectedIndex =  document.getElementById("results-list").selectedIndex
+			$.ajax({
+  				url: "/perform_vote",
+  				contentType: "application/json; charset=utf-8",
+  				type: "POST",
+  				dataType: "json",
+  				data: JSON.stringify({'index': selectedIndex}, null, '\t'),
+ 				success: function(jqXHR){
+ 					console.log("ok!");
+  				}
+			});
+
+			$("#results-form").bPopup().close();
+		}
+
 		function updateSatisfactionSmiley(satisfaction) {
 		
 			var iconUrlIdx;
@@ -88,12 +105,24 @@
 		$(document).ready(function() {
 		
 			var options = { 
-    			success: function(data) { 
+    			success: function(data) {
+    				json = jQuery.parseJSON(data)
         			//alert("A Rádio LSD agradece sua sugestão!");
                 	$('#form-submit').removeAttr('disabled');
-                	console.log($("#divTest"))
                 	$('#vote-form-inner').clearForm();
-                	$("#lean_overlay").leanModal();
+
+                	$('#result1').html(json["data"]["items"][0]["title"]);
+                	$('#result2').html(json["data"]["items"][1]["title"]);
+                	$('#result3').html(json["data"]["items"][2]["title"]);
+                	$('#result4').html(json["data"]["items"][3]["title"]);
+                	$('#result5').html(json["data"]["items"][4]["title"]);
+                	$('#result6').html(json["data"]["items"][5]["title"]);
+                	$('#result7').html(json["data"]["items"][6]["title"]);
+                	$('#result8').html(json["data"]["items"][7]["title"]);
+                	$('#result9').html(json["data"]["items"][8]["title"]);
+                	$('#result10').html(json["data"]["items"][9]["title"]);
+
+                	$("#results-form").bPopup();
 
     			},
     			
@@ -189,10 +218,23 @@
 			<a href="http://www.icecast.org/" target="blank"><div id="icecast-logo"></div></a>
 			<a href="http://www.w3.org/TR/html5/" target="blank"><div id="html5-logo"></div></a>
 	</div>
-	</div style:"display:none">
-		<a href="#">Buruffba</a>
-	</div>
-	
+
+	<div id="results-form" style="display:none;">
+	 <select id="results-list" size="10">
+        <option value="0" id="result1">Test 0</option>
+        <option value="1" id="result2">Test 1</option>
+        <option value="2" id="result3">Test 2</option>
+        <option value="2" id="result4">Test 2</option>
+        <option value="2" id="result5">Test 2</option>
+        <option value="2" id="result6">Test 2</option>
+        <option value="2" id="result7">Test 2</option>
+        <option value="2" id="result8">Test 2</option>
+        <option value="2" id="result9">Test 2</option>
+        <option value="2" id="result10">Test 2</option>
+      </select>
+      <br>
+      <center><input type="submit" value="Enviar Música Selecionada" onclick="selectSong()"></center>
+      </div>
 </body>
 
 <div>

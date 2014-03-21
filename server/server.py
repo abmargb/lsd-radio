@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, make_response
+from flask import Flask, render_template, request, redirect, url_for, make_response, session, json
 from threading import Thread
 import logging
 import simplejson, urllib
@@ -12,6 +12,7 @@ from radio_config import RADIO_ROOT, SERVER_URL, ICES_PID, STATUS_PAGE, ICES_PIP
 from xml.dom import minidom
 
 app = Flask(__name__)
+global currentResults
 unlike_votes = []
 like_votes = []
 current_status = {'satisfaction' : 0.5, 'song': '', 'listeners': 0}
@@ -55,6 +56,7 @@ def vote():
 def vote_test():
     logger.info("OK :)")
     vote = request.form["vote"]
+    session['vote'] = vote
     params = urllib.urlencode({'q': vote.encode('utf-8'), 'max-results': '10', 'v': '2', 'alt': 'jsonc'})
     url = "http://gdata.youtube.com/feeds/api/videos?%s" % params
     result = simplejson.load(urllib.urlopen(url))
@@ -62,10 +64,21 @@ def vote_test():
         logger.info(item["title"])
     return simplejson.dumps(result)
 
+@app.route('/perform_vote', methods= ["POST"]) 
+def perform_vote():
+    index = request.json["index"]
+    logger.info(session['vote'])
+    params = urllib.urlencode({'q': session['vote'].encode('utf-8'), 'max-results': '10', 'v': '2', 'alt': 'jsonc'})
+    url = "http://gdata.youtube.com/feeds/api/videos?%s" % params
+    result = simplejson.load(urllib.urlopen(url))
+    logger.info("Song suggested: " + result['data']['items'][int(index)]['title'])
+    item = result['data']['items'][int(index)]
+    video_json = simplejson.dumps({"id": item['id'], "title": item['title']})
+    radio_utils.append(radio_utils.get_path(RADIO_ROOT, 'to_process_votes'), 
+                          video_json)
+    logger.info("terminou")
+    return simplejson.dumps(current_status)
 
-    #params = urllib.urlencode({'q': vote.encode('utf-8'), 'max-results': '1', 'v': '2', 'alt': 'jsonc'})
-    #url = "http://gdata.youtube.com/feeds/api/videos?%s" % params
-    #return simplejson.dumps("")
 
 
 def get_vote(token):
@@ -172,11 +185,11 @@ def check_newsong():
         time.sleep(2)
         update_song()
 
-if __name__ == '__main__':
-    
+if __name__ == '__main__':   
     th=Thread(target=check_newsong)
     th.start()
     update_status()
     
     logging.basicConfig(level=logging.INFO, format='%(levelname)-8s %(message)s')
-    app.run(host='0.0.0.0', port=3000, debug=True)
+    app.config["SECRET_KEY"] = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+    app.run(host='app.local', port=3000, debug=True)
