@@ -1,0 +1,157 @@
+ffmpeg version 0.8.10-4:0.8.10-0ubuntu0.12.04.1, Copyright (c) 2000-2013 the Libav developers
+  built on Feb  6 2014 20:56:59 with gcc 4.6.3
+*** THIS PROGRAM IS DEPRECATED ***
+This program is only provided for compatibility and will be removed in a future release. Please use avconv instead.
+
+Seems stream 0 codec frame rate differs from container frame rate: 59.83 (359/6) -> 29.92 (359/12)
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'pipe:':
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 0
+    compatible_brands: isommp42
+    creation_time   : 2014-01-06 23:22:39
+  Duration: 00:03:32.43, start: 0.000000, bitrate: N/A
+    Stream #0.0(und): Video: h264 (Constrained Baseline), yuv420p, 640x360, 628 kb/s, 29.92 fps, 29.92 tbr, 359 tbn, 59.83 tbc
+    Stream #0.1(und): Audio: aac, 44100 Hz, stereo, s16, 95 kb/s
+    Metadata:
+      creation_time   : 2014-01-06 23:22:42
+Output #0, mp3, to '/local/lsd-radio/cache/htgkXBO9PJQ.mp3':
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 0
+    compatible_brands: isommp42
+    TDEN            : 2014-01-06 23:22:39
+    TSSE            : Lavf53.21.1
+    Stream #0.0(und): Audio: libmp3lame, 44100 Hz, stereo, s16, 128 kb/s
+    Metadata:
+      creation_time   : 2014-01-06 23:22:42
+Stream mapping:
+  Stream #0.1 -> #0.0
+Press ctrl-c to stop encoding
+size=     159kB time=10.16 bitrate= 128.2kbits/s    size=     219kB time=14.00 bitrate= 128.1kbits/s    size=     388kB time=24.79 bitrate= 128.1kbits/s    size=     695kB time=44.43 bitrate= 128.0kbits/s    size=    1038kB time=66.43 bitrate= 128.0kbits/s    size=    1367kB time=87.48 bitrate= 128.0kbits/s    size=    1769kB time=113.21 bitrate= 128.0kbits/s    size=    2142kB time=137.09 bitrate= 128.0kbits/s    size=    2537kB time=162.35 bitrate= 128.0kbits/s    size=    2984kB time=190.93 bitrate= 128.0kbits/s    size=    3320kB time=212.48 bitrate= 128.0kbits/s    
+video:0kB audio:3320kB global headers:0kB muxing overhead 0.007677%
+There is a concurrency error.
+ffmpeg version 0.8.10-4:0.8.10-0ubuntu0.12.04.1, Copyright (c) 2000-2013 the Libav developers
+  built on Feb  6 2014 20:56:59 with gcc 4.6.3
+*** THIS PROGRAM IS DEPRECATED ***
+This program is only provided for compatibility and will be removed in a future release. Please use avconv instead.
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'pipe:':
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 0
+    compatible_brands: isommp42
+    creation_time   : 2013-12-13 16:55:58
+  Duration: 00:03:53.80, start: 0.000000, bitrate: N/A
+    Stream #0.0(und): Video: h264 (Constrained Baseline), yuv420p, 480x360, 72 kb/s, 30 fps, 30 tbr, 60 tbn, 60 tbc
+    Stream #0.1(und): Audio: aac, 44100 Hz, stereo, s16, 95 kb/s
+    Metadata:
+      creation_time   : 2013-12-13 16:55:59
+Output #0, mp3, to '/local/lsd-radio/cache/MLLNaWs5SH0.mp3':
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 0
+    compatible_brands: isommp42
+    TDEN            : 2013-12-13 16:55:58
+    TSSE            : Lavf53.21.1
+    Stream #0.0(und): Audio: libmp3lame, 44100 Hz, stereo, s16, 128 kb/s
+    Metadata:
+      creation_time   : 2013-12-13 16:55:59
+Stream mapping:
+  Stream #0.1 -> #0.0
+Press ctrl-c to stop encoding
+size=     246kB time=15.70 bitrate= 128.1kbits/s    size=     729kB time=46.63 bitrate= 128.0kbits/s    size=    1207kB time=77.24 bitrate= 128.0kbits/s    size=    1693kB time=108.33 bitrate= 128.0kbits/s    size=    2196kB time=140.54 bitrate= 128.0kbits/s    size=    2674kB time=171.10 bitrate= 128.0kbits/s    size=    3165kB time=202.55 bitrate= 128.0kbits/s    size=    3654kB time=233.85 bitrate= 128.0kbits/s    
+video:0kB audio:3654kB global headers:0kB muxing overhead 0.006976%
+There is a concurrency error.
+ffmpeg version 0.8.10-4:0.8.10-0ubuntu0.12.04.1, Copyright (c) 2000-2013 the Libav developers
+  built on Feb  6 2014 20:56:59 with gcc 4.6.3
+*** THIS PROGRAM IS DEPRECATED ***
+This program is only provided for compatibility and will be removed in a future release. Please use avconv instead.
+ffmpeg version 0.8.10-4:0.8.10-0ubuntu0.12.04.1, Copyright (c) 2000-2013 the Libav developers
+  built on Feb  6 2014 20:56:59 with gcc 4.6.3
+*** THIS PROGRAM IS DEPRECATED ***
+This program is only provided for compatibility and will be removed in a future release. Please use avconv instead.
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'pipe:':
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 0
+    compatible_brands: isommp42
+    creation_time   : 2014-03-07 18:38:03
+  Duration: 00:06:24.77, start: 0.000000, bitrate: N/A
+    Stream #0.0(und): Video: h264 (Constrained Baseline), yuv420p, 640x360 [PAR 1281:1280 DAR 427:240], 403 kb/s, 25 fps, 25 tbr, 25 tbn, 50 tbc
+    Stream #0.1(und): Audio: aac, 44100 Hz, stereo, s16, 96 kb/s
+    Metadata:
+      creation_time   : 2014-03-07 18:38:07
+Output #0, mp3, to '/local/lsd-radio/cache/Ye7FKc1JQe4.mp3':
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 0
+    compatible_brands: isommp42
+    TDEN            : 2014-03-07 18:38:03
+    TSSE            : Lavf53.21.1
+    Stream #0.0(und): Audio: libmp3lame, 44100 Hz, stereo, s16, 128 kb/s
+    Metadata:
+      creation_time   : 2014-03-07 18:38:07
+Stream mapping:
+  Stream #0.1 -> #0.0
+Press ctrl-c to stop encoding
+size=     286kB time=18.29 bitrate= 128.1kbits/s    size=     652kB time=41.72 bitrate= 128.0kbits/s    size=    1148kB time=73.43 bitrate= 128.0kbits/s    size=    1275kB time=81.55 bitrate= 128.0kbits/s    size=    1800kB time=115.17 bitrate= 128.0kbits/s    Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'pipe:':
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 0
+    compatible_brands: isommp42
+    creation_time   : 2014-03-07 15:29:50
+  Duration: 00:04:34.62, start: 0.000000, bitrate: N/A
+    Stream #0.0(und): Video: h264 (Constrained Baseline), yuv420p, 480x360 [PAR 1:1 DAR 4:3], 428 kb/s, 29.97 fps, 29.97 tbr, 30k tbn, 59.94 tbc
+    Stream #0.1(und): Audio: aac, 44100 Hz, stereo, s16, 96 kb/s
+    Metadata:
+      creation_time   : 2014-03-07 15:29:51
+Output #0, mp3, to '/local/lsd-radio/cache/FTQbiNvZqaY.mp3':
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 0
+    compatible_brands: isommp42
+    TDEN            : 2014-03-07 15:29:50
+    TSSE            : Lavf53.21.1
+    Stream #0.0(und): Audio: libmp3lame, 44100 Hz, stereo, s16, 128 kb/s
+    Metadata:
+      creation_time   : 2014-03-07 15:29:51
+Stream mapping:
+  Stream #0.1 -> #0.0
+Press ctrl-c to stop encoding
+size=    2339kB time=149.68 bitrate= 128.0kbits/s    size=     168kB time=10.74 bitrate= 128.2kbits/s    size=    2695kB time=172.43 bitrate= 128.0kbits/s    size=     415kB time=26.57 bitrate= 128.1kbits/s    size=    3207kB time=205.24 bitrate= 128.0kbits/s    size=    3425kB time=219.17 bitrate= 128.0kbits/s    size=     554kB time=35.45 bitrate= 128.1kbits/s    size=    3929kB time=251.45 bitrate= 128.0kbits/s    size=    1023kB time=65.44 bitrate= 128.0kbits/s    size=    1066kB time=68.18 bitrate= 128.0kbits/s    size=    4192kB time=268.25 bitrate= 128.0kbits/s    size=    1546kB time=98.93 bitrate= 128.0kbits/s    size=    4664kB time=298.48 bitrate= 128.0kbits/s    size=    2021kB time=129.31 bitrate= 128.0kbits/s    size=    5129kB time=328.25 bitrate= 128.0kbits/s    size=    5343kB time=341.92 bitrate= 128.0kbits/s    size=    2109kB time=134.97 bitrate= 128.0kbits/s    size=    5850kB time=374.36 bitrate= 128.0kbits/s    size=    2593kB time=165.96 bitrate= 128.0kbits/s    size=    6013kB time=384.81 bitrate= 128.0kbits/s    
+video:0kB audio:6013kB global headers:0kB muxing overhead 0.004239%
+There is a concurrency error.
+size=    3052kB time=195.34 bitrate= 128.0kbits/s    size=    3172kB time=203.00 bitrate= 128.0kbits/s    size=    3686kB time=235.86 bitrate= 128.0kbits/s    size=    4160kB time=266.21 bitrate= 128.0kbits/s    size=    4292kB time=274.65 bitrate= 128.0kbits/s    
+video:0kB audio:4291kB global headers:0kB muxing overhead 0.005939%
+There is a concurrency error.
+ffmpeg version 0.8.10-4:0.8.10-0ubuntu0.12.04.1, Copyright (c) 2000-2013 the Libav developers
+  built on Feb  6 2014 20:56:59 with gcc 4.6.3
+*** THIS PROGRAM IS DEPRECATED ***
+This program is only provided for compatibility and will be removed in a future release. Please use avconv instead.
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'pipe:':
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 0
+    compatible_brands: isommp42
+    creation_time   : 2014-03-07 21:34:23
+  Duration: 00:08:01.69, start: 0.000000, bitrate: N/A
+    Stream #0.0(und): Video: h264 (Constrained Baseline), yuv420p, 384x288 [PAR 1:1 DAR 4:3], 372 kb/s, 25 fps, 25 tbr, 25 tbn, 50 tbc
+    Stream #0.1(und): Audio: aac, 44100 Hz, stereo, s16, 95 kb/s
+    Metadata:
+      creation_time   : 2014-03-07 21:34:25
+Output #0, mp3, to '/local/lsd-radio/cache/fX5USg8_1gA.mp3':
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 0
+    compatible_brands: isommp42
+    TDEN            : 2014-03-07 21:34:23
+    TSSE            : Lavf53.21.1
+    Stream #0.0(und): Audio: libmp3lame, 44100 Hz, stereo, s16, 128 kb/s
+    Metadata:
+      creation_time   : 2014-03-07 21:34:25
+Stream mapping:
+  Stream #0.1 -> #0.0
+Press ctrl-c to stop encoding
+size=     319kB time=20.40 bitrate= 128.1kbits/s    size=     689kB time=44.09 bitrate= 128.0kbits/s    size=    1150kB time=73.59 bitrate= 128.0kbits/s    size=    1279kB time=81.84 bitrate= 128.0kbits/s    size=    1765kB time=112.93 bitrate= 128.0kbits/s    size=    2255kB time=144.30 bitrate= 128.0kbits/s    size=    2503kB time=160.18 bitrate= 128.0kbits/s    size=    2992kB time=191.48 bitrate= 128.0kbits/s    size=    3127kB time=200.12 bitrate= 128.0kbits/s    size=    3601kB time=230.43 bitrate= 128.0kbits/s    size=    4063kB time=260.02 bitrate= 128.0kbits/s    size=    4146kB time=265.33 bitrate= 128.0kbits/s    size=    4584kB time=293.38 bitrate= 128.0kbits/s    size=    5030kB time=321.88 bitrate= 128.0kbits/s    size=    5437kB time=347.95 bitrate= 128.0kbits/s    size=    5876kB time=376.03 bitrate= 128.0kbits/s    size=    6319kB time=404.38 bitrate= 128.0kbits/s    size=    6650kB time=425.59 bitrate= 128.0kbits/s    size=    7126kB time=456.05 bitrate= 128.0kbits/s    size=    7527kB time=481.72 bitrate= 128.0kbits/s    
+video:0kB audio:7527kB global headers:0kB muxing overhead 0.003386%
+There is a concurrency error.
