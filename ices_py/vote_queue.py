@@ -4,6 +4,7 @@ import radio_utils
 import logging
 from radio_config import RADIO_ROOT, ICES_MODULE_ROOT
 from pprint import pprint
+from ices_logger import LOGGER
 
 PROCESSING_BUFFER_SIZE = 5
 
@@ -27,7 +28,7 @@ def get_next():
     lines_processed = radio_utils.lines(real_path('processed_votes'))
     lines_processing = radio_utils.lines(real_path('processing_votes'))
     
-    to_process = PROCESSING_BUFFER_SIZE - lines_processed - lines_processing
+    to_process = 1
     process(to_process)
     
     return file_path

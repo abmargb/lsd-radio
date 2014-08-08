@@ -1,13 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for, make_response, session, json
 from threading import Thread
 import logging
-import simplejson, urllib
+import simplejson, urllib, urllib2, base64
 import os
 import radio_utils
 import string
 import random
 import time
+import jsonpickle
 
+
+from song import Song
 from radio_config import RADIO_ROOT, SERVER_URL, ICES_PID, STATUS_PAGE, ICES_PIPE
 from xml.dom import minidom
 
@@ -15,71 +18,55 @@ app = Flask(__name__)
 global currentResults
 unlike_votes = []
 like_votes = []
-current_status = {'satisfaction' : 0.5, 'song': '', 'listeners': 0}
+current_status = {'satisfaction' : 0.5, 'song': '', 'last_song':'', 'listeners': 0}
 
 LISTENERS_IDX = 14
 PLAYING_IDX = 16
 
-
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                     datefmt='%m-%d %H:%M',
-                    filename='/tmp/logs/server.log',
+                    filename='/tmp/logs/ices.log',
                     filemode='a')
 
-logger = logging.getLogger('radio-server')
+LOGGER = logging.getLogger('radio-ices')
 
-'''
-@app.route('/vote', methods=["POST"])
-def vote():
-    
-    vote_input = request.form["vote"]
-    
-    votes = vote_input.split(";")
-    
-    for vote in votes:
-    
-        params = urllib.urlencode({'q': vote.encode('utf-8'), 'max-results': '1', 'v': '2', 'alt': 'jsonc'})
-        
-        url = "http://gdata.youtube.com/feeds/api/videos?%s" % params
-        result = simplejson.load(urllib.urlopen(url))
-        item = result['data']['items'][0]
-        logger.info(result['data'])
-        video_json = simplejson.dumps({"id": item['id'], "title": item['title']})
-        
-        radio_utils.append(radio_utils.get_path(RADIO_ROOT, 'to_process_votes'), 
-                           video_json)
-    
-    return simplejson.dumps(current_status)
-'''
-@app.route('/vote_test', methods=["POST"])
-def vote_test():
-    logger.info("OK :)")
+
+@app.route('/busca_resultados', methods=["POST"])
+def busca_resultados():
     vote = request.form["vote"]
     session['vote'] = vote
     params = urllib.urlencode({'q': vote.encode('utf-8'), 'max-results': '10', 'v': '2', 'alt': 'jsonc'})
     url = "http://gdata.youtube.com/feeds/api/videos?%s" % params
     result = simplejson.load(urllib.urlopen(url))
-    for item in result["data"]["items"]:
-        logger.info(item["title"])
     return simplejson.dumps(result)
 
 @app.route('/perform_vote', methods= ["POST"]) 
 def perform_vote():
     index = request.json["index"]
-    logger.info(session['vote'])
     params = urllib.urlencode({'q': session['vote'].encode('utf-8'), 'max-results': '10', 'v': '2', 'alt': 'jsonc'})
     url = "http://gdata.youtube.com/feeds/api/videos?%s" % params
     result = simplejson.load(urllib.urlopen(url))
-    logger.info("Song suggested: " + result['data']['items'][int(index)]['title'])
     item = result['data']['items'][int(index)]
     video_json = simplejson.dumps({"id": item['id'], "title": item['title']})
     radio_utils.append(radio_utils.get_path(RADIO_ROOT, 'to_process_votes'), 
                           video_json)
-    logger.info("terminou")
     return simplejson.dumps(current_status)
 
-
+@app.route('/vote_song', methods= ["POST"]) 
+def vote_song():
+    active_songs = get_applicant_songs()
+    index = int(request.json["vote_index"])
+    vote_type = request.json["vote_type"]
+    applicant = active_songs[int(index)]
+    if vote_type == "up":
+        active_songs[index].up_votes += 1
+    else:
+        active_songs[index].down_votes += 1
+    active_songs[index].balance = active_songs[index].up_votes - active_songs[index].down_votes
+    active_songs.sort(key=lambda Song: Song.balance, reverse=True)
+    update_file(active_songs)
+    return simplejson.dumps("")
 
 def get_vote(token):
     vote = 'none'
@@ -111,9 +98,14 @@ def update_satisfaction():
 
 @app.route('/status')
 def status():
+    active_songs = get_applicant_songs()
+    active_songs.sort(key=lambda Song: Song.balance, reverse=True)
+    update_file(active_songs)
+    if (current_status['song'] != current_status['last_song']):
+        current_status['last_song'] = current_status['song']
     token = request.cookies.get('token')
     return simplejson.dumps({"vote": get_vote(token), "current_song": current_status['song'], 
-                             "satisfaction": current_status['satisfaction']})
+                             "satisfaction": current_status['satisfaction'], "applicant_songs": get_applicant_titles()})
 
 @app.route('/like')
 def like():
@@ -156,8 +148,7 @@ def update_song():
     current_status['satisfaction'] = 0.5
     update_status()
     
-def update_status():
-    def ice_status():
+def ice_status():
         status_xml = urllib.urlopen(STATUS_PAGE).read()
         xml_doc = minidom.parseString(status_xml)
         pre = xml_doc.getElementsByTagName('pre')[0]
@@ -165,16 +156,62 @@ def update_status():
         status_list = status_text.split(',')
         
         return status_list
-    
+
+def ice_listeners():
+    ice_listeners = []
+    request = urllib2.Request("http://vermelho:8000/admin/listclients?mount=/ices")
+    base64string = base64.encodestring('%s:%s' % ("admin", "hackmein")).replace('\n', '')
+    request.add_header("Authorization", "Basic %s" % base64string)
+    status_xml = urllib2.urlopen(request).read()
+    xml_doc = minidom.parseString(status_xml)
+    stats = xml_doc.getElementsByTagName('icestats')[0]
+    source = stats.getElementsByTagName('source')[0]
+    listeners = source.getElementsByTagName('listener')
+
+    for listener in listeners:
+        LOGGER.info(listener.nodeValue)
+        ice_listeners.append(listener.getElementsByTagName('ID')[0].firstChild.nodeValue)
+
+    return ice_listeners
+
+def update_status():    
     status_list = ice_status()
-    
     if (len(status_list) <= PLAYING_IDX + 1):
         current_status['song'] = 'Sem musicas pra tocar'
         current_status['listeners'] = 1
         return
-    
-    current_status['song'] = status_list[PLAYING_IDX]
+
+    LOGGER.info(status_list)
+    current_song = open("current_song","r")
+    current_status['song'] = current_song.read()
+    current_song.close()
     current_status['listeners'] = int(status_list[LISTENERS_IDX])
+
+def get_applicant_songs():
+    songs = open(radio_utils.get_path(RADIO_ROOT, 'processed_votes'), "r")
+    applicants = []
+    for song in songs.readlines():
+        unpickled = jsonpickle.decode(song)
+        song = Song(unpickled["id"], unpickled["title"])
+        song.up_votes = unpickled["up_votes"]
+        song.down_votes = unpickled["down_votes"]
+        song.balance = song.up_votes - song.down_votes
+        song.path = unpickled["path"]
+        applicants.append(song)
+    songs.close()
+    return applicants
+
+def get_applicant_titles():
+    list = []
+    for applicant in get_applicant_songs():
+        list.append(applicant.title)
+    return list
+
+def update_file(active_songs):
+    songs = open(radio_utils.get_path(RADIO_ROOT, 'processed_votes'), "w")
+    for song in active_songs:
+        songs.write(jsonpickle.encode(song) + "\n")
+    songs.close()
 
 def check_newsong():    
     while (True):
@@ -192,4 +229,4 @@ if __name__ == '__main__':
     
     logging.basicConfig(level=logging.INFO, format='%(levelname)-8s %(message)s')
     app.config["SECRET_KEY"] = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
-    app.run(host='app.local', port=3000, debug=True)
+    app.run(host='0.0.0.0')
