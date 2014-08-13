@@ -5,6 +5,7 @@
 	<link href="static/bootstrap-3.2.0-dist/css/bootstrap.min.css" rel="stylesheet">
 	<link href="static/bootstrap-3.2.0-dist/css/custom.css" rel="stylesheet">
 	<link href="static/style.css" rel="stylesheet" type="text/css" />
+	<link href="http://goodybag.github.io/bootstrap-notify/css/bootstrap-notify.css" rel="stylesheet">
 	<script type="text/javascript" src="static/js/jquery-1.7.1.min.js"></script> 
     <script type="text/javascript" src="static/js/jquery.form.js"></script>
     <script type="text/javascript" src="static/js/jquery.autoresize.js"></script>
@@ -12,6 +13,7 @@
 
 	
 	<script type="text/javascript">
+		var stopBlinking = false;
 
 		function ffmp3Callback(event,value){
     		//alert('event: "'+event+'", value: "'+value+'"');
@@ -61,8 +63,7 @@
 		}
 		
 
-		function selectSong() {
-			selectedIndex =  document.getElementById("results-list").selectedIndex
+		function selectSong(selectedIndex) {
 			$.ajax({
   				url: "/perform_vote",
   				contentType: "application/json; charset=utf-8",
@@ -70,11 +71,20 @@
   				dataType: "json",
   				data: JSON.stringify({'index': selectedIndex}, null, '\t'),
  				success: function(data){
- 					updateApplicantsTable(data["applicant_songs"])
+ 								
   				}
 			});
 
+
 			$("#results-form").bPopup().close();
+
+			setTimeout(function() 
+			{
+			   stopBlinking = true;
+			   $(".alert-success").css('visibility','hidden');
+			}, 8000);
+
+			$(".alert-success").css('visibility','visible').hide().fadeIn("slow");
 		}
 
 		function updateSatisfactionSmiley(satisfaction) {
@@ -101,17 +111,41 @@
 		}
 		
 		function updateCurrentSong(song) {
-			$('#current-song').html(song);
+			$('#current-song').html("<blink>" + song + "</blink>");
 		}
 
 		function updateApplicantsTable(list) {
-			console.log(list[0])
 			table2 = $(".applicants_table")
 			table2.html("")
 			for (var i = 0; i < list.length; i++) {
-				table2.html(table2.html() + "<a style='font-size: 15px;' href='#'' class='list-group-item " + getMarkCss(i) + "'>" + list[i]  +  "<div style='margin-left:20px;''></div><input type='image' value='Vote DOWN' class='song_entry down entry-" + i + " btn btn-danger' src='static/img/thumb-down-icon.png' style='width:40px; height: 30px;margin-top:5px;''></td><td width='10px'><input type='image' class='song_entry up entry-" + i + " btn btn-success' src='static/img/thumb-up-icon.png' style='margin-left:5px; margin-top:5px; width:40px; height: 30px'></td></tr><tr>" + "</a>" )
+				table2.html(table2.html() + "<a style='font-size: 15px;' href='#'' class='list-group-item " + getMarkCss(i) + "'>" + list[i]  +  "<div style='margin-left:20px;''></div><input type='image' value='Vote DOWN' class='song_entry down entry-" + i + " btn btn-danger' src='static/img/down.png' style='width:40px; height: 30px;margin-top:5px;''></td><td width='10px'><input type='image' class='song_entry up entry-" + i + " btn btn-success' src='static/img/up.png' style='margin-left:5px; margin-top:5px; width:40px; height: 30px'></td></tr><tr>" + "</a>" )
 
 			}
+
+			if (list.length == 0) {
+        		table2.html(table2.html() +  "<div class='panel-body'>A fila de execução está vazia. Sugira algumas músicas! :)</div>");
+        	} 
+
+		}
+
+		function updateInfoBar(current_song) {
+			if(current_song == "Sem musicas pra tocar") {
+				$("#info-bar").css("display", "none");
+				$("#info-bar-sem-musicas").css("display", "block");
+			}
+			else {
+				$("#info-bar-sem-musicas").css("display", "none");
+				$("#info-bar").css("display", "block");
+
+			}
+		}
+
+		function updateOnlineUsers(online_users) {
+			onlineList = $(".online-users");
+			onlineList.html("")
+			for (i=0; i<online_users.length;i++) {
+				onlineList.html(onlineList.html() + "<a  href='#' class='list-group-item item1' style='height:35px !important; border-color:grey !important;'><img src='static/img/listening.png' style='margin-left:-8px; margin-bottom: 5px; margin-right: 5px;'>" + online_users[i] +"</a>");
+			}			
 		}
 
 		function getMarkCss(i) {
@@ -121,8 +155,46 @@
 
 			return ""
 		}
+
+		function blink(selector) {
+		    $(selector).fadeOut('slow', function() {
+		        $(this).fadeIn('slow', function() {
+		            if (!stopBlinking)
+		            {
+		                blink(this);
+		            }
+		            else
+		            {
+		                $(this).hide();
+		                stopBlinking = false;
+		            }
+		        });
+		    });
+		}
+
+
 	
 		$(document).ready(function() {
+
+			$(".name-panel").bPopup({
+			            speed: 650,
+			            transition: 'slideIn',
+				   		transitionClose: 'slideBack'
+			        });
+
+			$( ".btn-send-name" ).click(function() {
+				username = $(".username").val();
+				$.ajax({
+	  				url: "/define_name",
+	  				contentType: "application/json; charset=utf-8",
+	  				type: "POST",
+	  				dataType: "json",
+	  				data: JSON.stringify({"username":username}, null, '\t'),
+	 				success: function(jqXHR){
+	 					$(".name-panel").bPopup().close();
+	  				}
+				});
+			});
 
 			$(".song_entry").live("click", function (e) {
 				vote_index = $(this).attr('class').split(" ")[2].split("-")[1]
@@ -145,18 +217,20 @@
                 	$('#form-submit').removeAttr('disabled');
                 	$('#vote-form-inner').clearForm();
 
-                	$('#result1').html(json["data"]["items"][0]["title"]);
-                	$('#result2').html(json["data"]["items"][1]["title"]);
-                	$('#result3').html(json["data"]["items"][2]["title"]);
-                	$('#result4').html(json["data"]["items"][3]["title"]);
-                	$('#result5').html(json["data"]["items"][4]["title"]);
-                	$('#result6').html(json["data"]["items"][5]["title"]);
-                	$('#result7').html(json["data"]["items"][6]["title"]);
-                	$('#result8').html(json["data"]["items"][7]["title"]);
-                	$('#result9').html(json["data"]["items"][8]["title"]);
-                	$('#result10').html(json["data"]["items"][9]["title"]);
+                	$('.lista-resultados').html("")
 
-                	$("#results-form").bPopup();
+                	for(i = 0; i<10;i++) {
+                		$('.lista-resultados').html($('.lista-resultados').html() + "<a href='#'' class='list-group-item list-group-item2' style=border-color:grey !important;'  onClick=selectSong(" +i+ ")><img style='margin-right: 10px;' src='" + json["data"]["items"][i]["thumbnail"]["hqDefault"] + "' alt='Smiley face' width='50' height='50'>" +  json["data"]["items"][i]["title"] + "</a>");
+                	}
+
+                	
+                	$("#results-form").bPopup({
+			            speed: 650,
+			            transition: 'slideIn',
+				   		transitionClose: 'slideBack'
+			        });
+
+
 
     			},
     			
@@ -183,6 +257,8 @@
      			updateSatisfactionSmiley(data.satisfaction);
      			updateCurrentSong(data.current_song);
      			updateApplicantsTable(data.applicant_songs);
+     			updateInfoBar(data.current_song);
+     			updateOnlineUsers(data.online_users)
    			};
    			
    			$('#vote-textarea').autoResize({
@@ -200,6 +276,7 @@
 </head>
 
 <body style="font-family: Trebuchet MS; background-image: url('static/img/background.jpg');background-size: 100% 100%;";>
+	<div class='notifications bottom-right'></div>
 
 	<!-- Navigation -->
     <nav class="navbar navbar-default navbar-fixed-top">
@@ -213,10 +290,23 @@
                     <span class="icon-bar"></span>
                 </button>
 
-            	<div>
-            		<img src="static/img/playing.png" style="float:left;margin-right:5px;margin-top:7px;">
-                	<a class="navbar-brand" style:"font-weight:bold; color:white !important;">Ouvindo agora:</a>
-                	<a class="navbar-brand" id="current-song">Start Bootstrap</a>
+
+            	<div id="info-bar">
+            		<img src="static/img/playing.png" style="float:left;margin-right:5px;margin-top:10px;margin-left:-400px;">
+                	<a class="navbar-brand" style="margin-left:-370px !important;">Ouvindo agora:</a>
+                	<a class="navbar-brand" id="current-song" style="margin-left:-190px !important;">Start Bootstrap</a>
+                	<div style="float:left">
+                		<input type="image" title="Curti!" src="static/img/woot.png" style="float:left;margin-right:5px;margin-top:10px;"/>
+                		<span class="badge" style="margin-left:-12px; margin-top:5px">12</span>
+                	</div>                	
+                	<div style="float:left">
+                		<input type="image" title="Curti!" src="static/img/meh.png" style="float:left;margin-right:5px;margin-top:10px; margin-left:8px;"/>
+                		<span class="badge" style="margin-left:-12px; margin-top:5px">5</span>
+                	</div>
+                </div>
+
+                <div id="info-bar-sem-musicas">
+            		<a class="navbar-brand" style="margin-left:-370px !important;">Sem músicas para executar</a>
                 </div>
 
             </div>
@@ -255,57 +345,74 @@
     </nav>
 
 	<div id="main" class="container cleafix">
+
+	<div class="alert alert-success" style="visibility: hidden; margin-top: 5px;">
+	  <a class="close" data-dismiss="alert">×</a>
+	  <strong>Muito obrigado!</strong> Sua sugestão foi computada com sucesso e aparecerá na fila assim que seu processamento for finalizado!
+	</div>
 	
-	<label style="font-size: 40px; font-weight: bold; margin-top: 20px">Dê sua opinião sobre a música atual!</label>
-		<div id="player-toolbar" class="clearfix">
-			<ul>
-				
-				<li><a id="unlike-button" {% if vote == 'none' %} href="javascript:void(0)" onClick="unlike();" {% endif %}>
-					<img id="unlike-button-img" src="static/img/dislike_{% if vote == 'unlike' %}red_{% endif %}48.png">
-				</a></li>
-				
-				<li><img id="player-smiley-img" src="static/img/s_3_48.png"></li>
-				
-				<li><a id="like-button" {% if vote == 'none' %} href="javascript:void(0)" onClick="like();" {% endif %}>
-					<img id="like-button-img" src="static/img/like_{% if vote == 'like' %}green_{% endif %}48.png">
-				</a></li>
-				
-			</ul>
-		</div>
+		
 
 
 
 		<center style="margin-top: 50px">
-			<label style="font-size: 40px; font-weight: bold; margin-top: 20px">Vote na próxima música!</label>
-			<div class="list-group applicants_table">
+		<div class="panel panel-primary"  style="width: 500px !important;border-color:#6c4a96 !important"> 
+			  <div class="panel-heading" style="background-color:#6c4a96 !important;border-color:#6c4a96 !important">
+			    <h3 class="panel-title">Fila de execução</h3>
+			  </div>
+			  
+			  <div class="list-group applicants_table">
 
 			</div>
+		</div>
+			
 		</center>
 	
 		<div id="vote-form" class="clearfix">
 		<form id="vote-form-inner" action="busca_resultados" method="post">
-			<textarea rows="1" cols="50" name="vote" id="vote-textarea" class="form-control" placeholder="Sugira uma música!"></textarea>
+			<textarea rows="1" cols="50" name="vote" id="vote-textarea" class="form-control" placeholder="Sugira uma música!" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Sugira uma música!'"></textarea>
 			<button type="submit" id="form-submit" class="btn btn-large btn-primary">Pesquisar</button>
 		</form>
 		</div>
 	</div>
 	
-	<div id="results-form" style="display:none;" class="row">
-	 <select id="results-list"size="10" class="form-control">
-        <option value="0" id="result1">Test 0</option>
-        <option value="1" id="result2">Test 1</option>
-        <option value="2" id="result3">Test 2</option>
-        <option value="2" id="result4">Test 2</option>
-        <option value="2" id="result5">Test 2</option>
-        <option value="2" id="result6">Test 2</option>
-        <option value="2" id="result7">Test 2</option>
-        <option value="2" id="result8">Test 2</option>
-        <option value="2" id="result9">Test 2</option>
-        <option value="2" id="result10">Test 2</option>
-      </select>
-      <br>
-      <center><input type="submit" value="Enviar Música Selecionada" onclick="selectSong()" class="btn btn-large btn-primary" style="margin-top: 10px"></center>
-      </div>
+
+      <div class="panel panel-primary"  id="results-form" style="display:none;border-color:#6c4a96 !important"> 
+		  <div class="panel-heading" style="background-color:#6c4a96 !important;border-color:#6c4a96 !important">
+		    <h3 class="panel-title">Resultados de Busca</h3>
+		  </div>
+		  <div class="list-group lista-resultados">
+		    <a href="#" class="list-group-item item1" style="height:35px !important; border-color:grey !important;">Dapibus ac facilisis in</a>
+		  </div>
+	</div>
+
+	<div class="panel panel-primary"  id="online-users" style="width:200px;right: 0 !important;bottom: 0;position: absolute; margin-right:10px;border-color:#6c4a96 !important"> 
+		  <div class="panel-heading" style="background-color:#6c4a96 !important;border-color:#6c4a96 !important">
+		    <h3 class="panel-title">Usuários Online</h3>
+		  </div>
+		  <div class="list-group online-users" style="width: 200px !important;">
+		    <a href="#" class="list-group-item item1" style="height:35px !important; border-color:grey !important;">Dapibus ac facilisis in</a>
+		  </div>
+	</div>
+
+	<div class="panel panel-primary name-panel"  id="online-users" style="width: 600px !important; display:none;border-color:#6c4a96 !important"> 
+		<div class="panel-heading" style="background-color:#6c4a96 !important;border-color:#6c4a96 !important">
+		    <h3 class="panel-title">Por favor, informe ou atualize seu username (ou permaneça anônimo)</h3>
+		  </div>
+		  <div class="input-group">
+      <input type="text" class="form-control username" placeholder="Anônimo">
+      <span class="input-group-btn">
+        <button class="btn btn-default btn-send-name" type="button">Go!</button>
+      </span>
+    </div><!-- /input-group -->
+	</div>
+
+	
+
+
+
+	
+
 </body>
 
 <div>

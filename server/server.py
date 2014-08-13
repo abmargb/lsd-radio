@@ -8,6 +8,10 @@ import string
 import random
 import time
 import jsonpickle
+import time
+from datetime import datetime
+
+from redis import Redis
 
 
 from song import Song
@@ -16,6 +20,7 @@ from xml.dom import minidom
 
 app = Flask(__name__)
 global currentResults
+global currentU_users
 unlike_votes = []
 like_votes = []
 current_status = {'satisfaction' : 0.5, 'song': '', 'last_song':'', 'listeners': 0}
@@ -31,14 +36,67 @@ logging.basicConfig(level=logging.DEBUG,
 
 LOGGER = logging.getLogger('radio-ices')
 
+def get_online_users():
+    current = int(time.time()) // 60
+    minutes = xrange(5)
+    redis = Redis()
+    return redis.sunion(['online-users/%d' % (current - x)
+                         for x in minutes])
+
+@app.route('/define_name', methods=["POST"])
+def define_name():
+    update_user_file(request.remote_addr,request.json["username"])
+    return simplejson.dumps("")
+
+def update_user_file(addr, username):
+    users_file = open("users","r")
+    users = users_file.readlines()
+    new_users = []
+    updated = False
+    for entry in users:
+        if len(entry) > 1:
+            if entry.split(" ")[0] == addr:
+                updated = True
+                new_users.append("%s %s" % (addr,username))
+            else:
+                new_users.append(entry)
+    if not updated:
+        new_users.append("%s %s" % (addr, username))
+
+    users_file.close()
+    users_file = open("users","w")
+    for user in new_users:
+        users_file.write(user + "\n")
+    users_file.close()
+
+def normalize_users_file():
+    pings = [ping.rstrip() for ping in open("ping","r").readlines()]
+    old_users = open("users","r").readlines()
+
+    updated_users = []
+
+    LOGGER.info("pings")
+    LOGGER.info(pings)
+    LOGGER.info("old_users")
+    LOGGER.info(old_users)
+
+    for user in old_users:
+        if len(user) > 1 and user.split(" ")[0] in pings:
+            updated_users.append(user)
+
+    new_users = open("users","w")
+    for user in updated_users:
+        new_users.write(user)
+    new_users.close()
 
 @app.route('/busca_resultados', methods=["POST"])
 def busca_resultados():
     vote = request.form["vote"]
     session['vote'] = vote
-    params = urllib.urlencode({'q': vote.encode('utf-8'), 'max-results': '10', 'v': '2', 'alt': 'jsonc'})
+    params = urllib.urlencode({'q': vote.encode('utf-8'), 'max-results': '10', 'v': '2', 'alt': 'jsonc', 'category':'music'})
     url = "http://gdata.youtube.com/feeds/api/videos?%s" % params
     result = simplejson.load(urllib.urlopen(url))
+    LOGGER.info(url)
     return simplejson.dumps(result)
 
 @app.route('/perform_vote', methods= ["POST"]) 
@@ -49,6 +107,7 @@ def perform_vote():
     result = simplejson.load(urllib.urlopen(url))
     item = result['data']['items'][int(index)]
     video_json = simplejson.dumps({"id": item['id'], "title": item['title']})
+    LOGGER.info(video_json)
     radio_utils.append(radio_utils.get_path(RADIO_ROOT, 'to_process_votes'), 
                           video_json)
     return simplejson.dumps(current_status)
@@ -97,7 +156,8 @@ def update_satisfaction():
         skip_song()
 
 @app.route('/status')
-def status():
+def status():  
+    update_ping_file(request.remote_addr)
     active_songs = get_applicant_songs()
     active_songs.sort(key=lambda Song: Song.balance, reverse=True)
     update_file(active_songs)
@@ -105,7 +165,7 @@ def status():
         current_status['last_song'] = current_status['song']
     token = request.cookies.get('token')
     return simplejson.dumps({"vote": get_vote(token), "current_song": current_status['song'], 
-                             "satisfaction": current_status['satisfaction'], "applicant_songs": get_applicant_titles()})
+                             "satisfaction": current_status['satisfaction'], "applicant_songs": get_applicant_titles(), "online_users": get_online_users()})
 
 @app.route('/like')
 def like():
@@ -157,23 +217,6 @@ def ice_status():
         
         return status_list
 
-def ice_listeners():
-    ice_listeners = []
-    request = urllib2.Request("http://vermelho:8000/admin/listclients?mount=/ices")
-    base64string = base64.encodestring('%s:%s' % ("admin", "hackmein")).replace('\n', '')
-    request.add_header("Authorization", "Basic %s" % base64string)
-    status_xml = urllib2.urlopen(request).read()
-    xml_doc = minidom.parseString(status_xml)
-    stats = xml_doc.getElementsByTagName('icestats')[0]
-    source = stats.getElementsByTagName('source')[0]
-    listeners = source.getElementsByTagName('listener')
-
-    for listener in listeners:
-        LOGGER.info(listener.nodeValue)
-        ice_listeners.append(listener.getElementsByTagName('ID')[0].firstChild.nodeValue)
-
-    return ice_listeners
-
 def update_status():    
     status_list = ice_status()
     if (len(status_list) <= PLAYING_IDX + 1):
@@ -186,6 +229,11 @@ def update_status():
     current_status['song'] = current_song.read()
     current_song.close()
     current_status['listeners'] = int(status_list[LISTENERS_IDX])
+
+def update_ping_file(address):
+    users_file = open("ping","a")
+    users_file.write("%s\n" % (address))
+    users_file.close()
 
 def get_applicant_songs():
     songs = open(radio_utils.get_path(RADIO_ROOT, 'processed_votes'), "r")
@@ -200,6 +248,14 @@ def get_applicant_songs():
         applicants.append(song)
     songs.close()
     return applicants
+
+def get_online_users():
+    users_file = open("users","r")
+    users = []
+    for user in users_file.readlines():
+        if len(user) > 1:
+            users.append(user.split(" ")[1])
+    return users
 
 def get_applicant_titles():
     list = []
@@ -222,10 +278,19 @@ def check_newsong():
         time.sleep(2)
         update_song()
 
+def reset_ping_file():
+    while (True):
+        normalize_users_file()
+        users_file = open("ping","w").close()
+        time.sleep(30)
+
 if __name__ == '__main__':   
     th=Thread(target=check_newsong)
     th.start()
     update_status()
+
+    th2=Thread(target=reset_ping_file)
+    th2.start()
     
     logging.basicConfig(level=logging.INFO, format='%(levelname)-8s %(message)s')
     app.config["SECRET_KEY"] = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
