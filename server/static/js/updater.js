@@ -14,4 +14,4 @@ var update = function () {
 }
 
 update()
-setInterval(update, 10000);
+setInterval(update, 5000);

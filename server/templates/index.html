@@ -6,36 +6,35 @@
 	<link href="static/bootstrap-3.2.0-dist/css/custom.css" rel="stylesheet">
 	<link href="static/style.css" rel="stylesheet" type="text/css" />
 	<link href="http://goodybag.github.io/bootstrap-notify/css/bootstrap-notify.css" rel="stylesheet">
-	<script type="text/javascript" src="static/js/jquery-1.7.1.min.js"></script> 
+	<script type="text/javascript" src="static/js/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="static/js/jquery.form.js"></script>
     <script type="text/javascript" src="static/js/jquery.autoresize.js"></script>
     <script type="text/javascript" src="static/js/jquery.bpopup.min.js"></script>
+    <script type="text/javascript" src="static/js/jquery.cookie.js"></script>
 
-	
+
 	<script type="text/javascript">
-		var stopBlinking = false;
-
 		function ffmp3Callback(event,value){
     		//alert('event: "'+event+'", value: "'+value+'"');
 		}
-	
+
 		function disableLikeButtons() {
 			$('#unlike-button').removeAttr('onClick', '');
  			$('#unlike-button').removeAttr('href', '');
     		$('#like-button').removeAttr('onClick', '');
  			$('#like-button').removeAttr('href', '');
 		}
-		
+
 		function enableLikeButtons() {
 			$('#unlike-button').attr('onClick', 'unlike();');
  			$('#unlike-button').attr('href', 'javascript:void(0)');
     		$('#like-button').attr('onClick', 'like();');
  			$('#like-button').attr('href', 'javascript:void(0)');
- 			
+
  			$('#unlike-button-img').attr('src', 'static/img/dislike_48.png');
  			$('#like-button-img').attr('src', 'static/img/like_48.png');
 		}
-		
+
 		function unlike() {
  			disableLikeButtons()
 			$('#unlike-button-img').attr('src', 'static/img/dislike_d_48.png');
@@ -48,7 +47,7 @@
   				}
 			});
 		}
-	
+
 		function like() {
 			$('#like-button-img').attr('src', 'static/img/like_d_48.png');
     		disableLikeButtons()
@@ -61,7 +60,7 @@
   				}
 			});
 		}
-		
+
 
 		function selectSong(selectedIndex) {
 			$.ajax({
@@ -71,14 +70,14 @@
   				dataType: "json",
   				data: JSON.stringify({'index': selectedIndex}, null, '\t'),
  				success: function(data){
- 								
+
   				}
 			});
 
 
 			$("#results-form").bPopup().close();
 
-			setTimeout(function() 
+			setTimeout(function()
 			{
 			   stopBlinking = true;
 			   $(".alert-success").css('visibility','hidden');
@@ -88,9 +87,9 @@
 		}
 
 		function updateSatisfactionSmiley(satisfaction) {
-		
+
 			var iconUrlIdx;
-			
+
 			if (satisfaction < 0.3) {
 				iconUrlIdx = "0"
 			} else if (satisfaction < 0.4) {
@@ -106,10 +105,10 @@
 			} else {
 			    iconUrlIdx = "6"
 			}
-			
+
 			$('#player-smiley-img').attr('src', 'static/img/s_' + iconUrlIdx + '_48.png');
 		}
-		
+
 		function updateCurrentSong(song) {
 			$('#current-song').html("<blink>" + song + "</blink>");
 		}
@@ -118,13 +117,13 @@
 			table2 = $(".applicants_table")
 			table2.html("")
 			for (var i = 0; i < list.length; i++) {
-				table2.html(table2.html() + "<a style='font-size: 15px;' href='#'' class='list-group-item " + getMarkCss(i) + "'>" + list[i]  +  "<div style='margin-left:20px;''></div><input type='image' value='Vote DOWN' class='song_entry down entry-" + i + " btn btn-danger' src='static/img/down.png' style='width:40px; height: 30px;margin-top:5px;''></td><td width='10px'><input type='image' class='song_entry up entry-" + i + " btn btn-success' src='static/img/up.png' style='margin-left:5px; margin-top:5px; width:40px; height: 30px'></td></tr><tr>" + "</a>" )
+				table2.html(table2.html() + "<a style='font-size: 15px;' href='#'' class='list-group-item " + getMarkCss(i) + "'>" + list[i]  +  "<div style='margin-left:20px;''></div><input " + getVotedCss(list[i]) +  " type='image' value='Vote DOWN' class='song_entry down entry-" + i + " btn btn-danger' src='static/img/down.png' style='width:40px; height: 30px;margin-top:5px;''></td><td width='10px'><input " + getVotedCss(list[i]) + " type='image' class='song_entry up entry-" + i + " btn btn-success' src='static/img/up.png' style='margin-left:5px; margin-top:5px; width:40px; height: 30px'></td></tr><tr></a>" )
 
 			}
 
 			if (list.length == 0) {
         		table2.html(table2.html() +  "<div class='panel-body'>A fila de execução está vazia. Sugira algumas músicas! :)</div>");
-        	} 
+        	}
 
 		}
 
@@ -145,15 +144,37 @@
 			onlineList.html("")
 			for (i=0; i<online_users.length;i++) {
 				onlineList.html(onlineList.html() + "<a  href='#' class='list-group-item item1' style='height:35px !important; border-color:grey !important;'><img src='static/img/listening.png' style='margin-left:-8px; margin-bottom: 5px; margin-right: 5px;'>" + online_users[i] +"</a>");
-			}			
+			}
+		}
+
+		function updateFeedbackCount(negative_votes, positive_votes, changed_song_this_round) {
+			$(".meh-count").html(negative_votes);
+			$(".woot-count").html(positive_votes);
+			if(changed_song_this_round) {
+				$(".feedback-woot").removeAttr("disabled");
+				$(".feedback-meh").removeAttr("disabled");
+				$.cookie('provided_feedback_this_round',false)
+			}
+
+			else if ($.cookie('provided_feedback_this_round') == "true") {
+				$(".feedback-woot").attr("disabled","disabled");
+				$(".feedback-meh").attr("disabled","disabled");
+			}
 		}
 
 		function getMarkCss(i) {
 			if (i == 0) {
-				return "active"
+				return "active";
 			}
 
-			return ""
+			return "";
+		}
+
+		function getVotedCss(element) {
+			if($.cookie('votedSongs').split("|").indexOf(element) != -1) {
+				return "disabled";
+			}
+			return "";
 		}
 
 		function blink(selector) {
@@ -173,8 +194,18 @@
 		}
 
 
-	
+
 		$(document).ready(function() {
+			if (!$.cookie('votedSongs')) {
+				var date = new Date();
+				var minutes = 30;
+				date.setTime(date.getTime() + (minutes * 60 * 1000));
+				$.cookie('votedSongs',"", { expires: date });
+			}
+
+			if (!$.cookie('provided_feedback_this_round')) {
+				$.cookie('provided_feedback_this_round','false');
+			}
 
 			$(".name-panel").bPopup({
 			            speed: 650,
@@ -198,19 +229,57 @@
 
 			$(".song_entry").live("click", function (e) {
 				vote_index = $(this).attr('class').split(" ")[2].split("-")[1]
-				vote_type = $(this).attr('class').split(" ")[1]
+					vote_type = $(this).attr('class').split(" ")[1]
+					$.cookie('votedSongs', $.cookie('votedSongs').concat($(this).parent().html().split("<div")[0]) + "|" );
+				    $.ajax({
+	  				url: "/vote_song",
+	  				contentType: "application/json; charset=utf-8",
+	  				type: "POST",
+	  				dataType: "json",
+	  				data: JSON.stringify({'vote_index': vote_index, 'vote_type' : vote_type}, null, '\t'),
+	 				success: function(data,textStatus,jqXHR){
+	  					updateApplicantsTable(data["applicant_songs"])
+	  				}
+				});
+			});
+
+			$(".feedback-woot").live("click", function (e) {
 			    $.ajax({
-  				url: "/vote_song",
-  				contentType: "application/json; charset=utf-8",
-  				type: "POST",
-  				dataType: "json",
-  				data: JSON.stringify({'vote_index': vote_index, 'vote_type' : vote_type}, null, '\t'),
- 				success: function(jqXHR){
-  				}
+	  				url: "/feedback",
+	  				contentType: "application/json; charset=utf-8",
+	  				type: "POST",
+	  				dataType: "json",
+	  				data: JSON.stringify({'feedback_type':'woot'}, null, '\t'),
+	 				success: function(data,textStatus,jqXHR){
+	 					$(".meh-count").html(data["negative_votes"]);
+	 					$(".woot-count").html(data["positive_votes"]);
+	 					$(".feedback-meh").attr("disabled","disabled");
+	 					$(".feedback-woot").attr("disabled","disabled");
+	 					$.cookie('provided_feedback_this_round',true)
+	  				}
+				});
 			});
+
+			$(".feedback-meh").live("click", function (e) {
+				$.ajax({
+	  				url: "/feedback",
+	  				contentType: "application/json; charset=utf-8",
+	  				type: "POST",
+	  				dataType: "json",
+	  				data: JSON.stringify({'feedback_type':'meh'}, null, '\t'),
+	 				success: function(data,textStatus,jqXHR){
+	 					$(".meh-count").html(data["negative_votes"]);
+	 					$(".woot-count").html(data["positive_votes"]);
+	 					$(".feedback-meh").attr("disabled","disabled");
+	 					$(".feedback-woot").attr("disabled","disabled");
+	 					$.cookie('provided_feedback_this_round',true)
+	  				}
+				});
 			});
-		
-			var options = { 
+
+
+
+			var options = {
     			success: function(data) {
     				json = jQuery.parseJSON(data)
         			//alert("A Rádio LSD agradece sua sugestão!");
@@ -223,7 +292,7 @@
                 		$('.lista-resultados').html($('.lista-resultados').html() + "<a href='#'' class='list-group-item list-group-item2' style=border-color:grey !important;'  onClick=selectSong(" +i+ ")><img style='margin-right: 10px;' src='" + json["data"]["items"][i]["thumbnail"]["hqDefault"] + "' alt='Smiley face' width='50' height='50'>" +  json["data"]["items"][i]["title"] + "</a>");
                 	}
 
-                	
+
                 	$("#results-form").bPopup({
 			            speed: 650,
 			            transition: 'slideIn',
@@ -233,21 +302,53 @@
 
 
     			},
-    			
-    			error: function() { 
+
+    			error: function() {
         			alert("Sugestão não computada por problemas técnicos :(");
                 	$('#form-submit').removeAttr('disabled');
                 	$('#vote-form-inner').clearForm();
     			},
-    			
-    			beforeSubmit: function() { 
-        			$('#form-submit').attr('disabled','disabled'); 
+
+    			beforeSubmit: function() {
+        			$('#form-submit').attr('disabled','disabled');
     			}
 			};
-			
-            // bind 'myForm' and provide a simple callback function 
+
+            // bind 'myForm' and provide a simple callback function
             $('#vote-form-inner').ajaxForm(options);
-           	
+
+            $('#vote-textarea').keypress(function (e) {
+			  if (e.which == 13) {
+			  		e.preventDefault()
+	                $('#form-submit').submit()
+			  }
+			});
+
+			$('.username').keypress(function (e) {
+			  if (e.which == 13) {
+			  		e.preventDefault()
+	                username = $(".username").val();
+		                if (username.length > 0) {
+		                	$.ajax({
+			  				url: "/define_name",
+			  				contentType: "application/json; charset=utf-8",
+			  				type: "POST",
+			  				dataType: "json",
+			  				data: JSON.stringify({"username":username}, null, '\t'),
+			 				success: function(jqXHR){
+			 					$(".name-panel").bPopup().close();
+			  				}
+						});
+	                }
+
+	                else {
+	                	$(".name-panel").bPopup().close();
+	                }
+
+			  }
+			});
+
+
            	var updater = new Worker('static/js/updater.js');
            	updater.onmessage = function (event) {
      			var data = jQuery.parseJSON(event.data);
@@ -258,21 +359,22 @@
      			updateCurrentSong(data.current_song);
      			updateApplicantsTable(data.applicant_songs);
      			updateInfoBar(data.current_song);
-     			updateOnlineUsers(data.online_users)
+     			updateOnlineUsers(data.online_users);
+     			updateFeedbackCount(data.negative_votes, data.positive_votes, data.changed_song_this_round);
    			};
-   			
+
    			$('#vote-textarea').autoResize({
     			maxHeight: 200,
     			minHeight: 50
 			});
-           	
+
         });
-        
+
 	</script>
-	
+
 	<title>LSD Radio - Fazendo sua cabeça</title>
 
-	
+
 </head>
 
 <body style="font-family: Trebuchet MS; background-image: url('static/img/background.jpg');background-size: 100% 100%;";>
@@ -292,21 +394,20 @@
 
 
             	<div id="info-bar">
-            		<img src="static/img/playing.png" style="float:left;margin-right:5px;margin-top:10px;margin-left:-400px;">
-                	<a class="navbar-brand" style="margin-left:-370px !important;">Ouvindo agora:</a>
-                	<a class="navbar-brand" id="current-song" style="margin-left:-190px !important;">Start Bootstrap</a>
-                	<div style="float:left">
-                		<input type="image" title="Curti!" src="static/img/woot.png" style="float:left;margin-right:5px;margin-top:10px;"/>
-                		<span class="badge" style="margin-left:-12px; margin-top:5px">12</span>
-                	</div>                	
-                	<div style="float:left">
-                		<input type="image" title="Curti!" src="static/img/meh.png" style="float:left;margin-right:5px;margin-top:10px; margin-left:8px;"/>
-                		<span class="badge" style="margin-left:-12px; margin-top:5px">5</span>
+            		<div style="position:fixed; left:0">
+            			<img class="navbar-brand" src="static/img/playing.png" style="width:60px; height:60px; margin-top: -5px !important; margin-left: 10px;">
+	                	<a class="navbar-brand">Ouvindo agora:</a>
+	                	<a class="navbar-brand" id="current-song">Start Bootstrap</a>
+	                	<input class="navbar-brand feedback-woot" type="image" title="Curti!" src="static/img/woot.png" style="width:60px; height:60px; margin-top: -5px !important;-webkit-appearance: none;"/>
+	                	<span class="badge navbar-brand woot-count" style="margin-left:-25px !important; margin-top:5px !important; font-size: 15px !important; height:20px !important;">15</span>
+	                	<input class="navbar-brand feedback-meh" type="image" title="Curti!" src="static/img/meh.png" style="width:60px; height:60px; margin-top: -5px !important;">
+	                	<span class="badge navbar-brand meh-count" style="margin-left:-25px !important; margin-top:5px !important; font-size: 15px !important; height:20px !important;">5</span>
+            		</div>
+
                 	</div>
                 </div>
-
                 <div id="info-bar-sem-musicas">
-            		<a class="navbar-brand" style="margin-left:-370px !important;">Sem músicas para executar</a>
+            		<a class="navbar-brand">Sem músicas para executar</a>
                 </div>
 
             </div>
@@ -350,24 +451,24 @@
 	  <a class="close" data-dismiss="alert">×</a>
 	  <strong>Muito obrigado!</strong> Sua sugestão foi computada com sucesso e aparecerá na fila assim que seu processamento for finalizado!
 	</div>
-	
-		
+
+
 
 
 
 		<center style="margin-top: 50px">
-		<div class="panel panel-primary"  style="width: 500px !important;border-color:#6c4a96 !important"> 
+		<div class="panel panel-primary"  style="width: 500px !important;border-color:#6c4a96 !important">
 			  <div class="panel-heading" style="background-color:#6c4a96 !important;border-color:#6c4a96 !important">
 			    <h3 class="panel-title">Fila de execução</h3>
 			  </div>
-			  
+
 			  <div class="list-group applicants_table">
 
 			</div>
 		</div>
-			
+
 		</center>
-	
+
 		<div id="vote-form" class="clearfix">
 		<form id="vote-form-inner" action="busca_resultados" method="post">
 			<textarea rows="1" cols="50" name="vote" id="vote-textarea" class="form-control" placeholder="Sugira uma música!" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Sugira uma música!'"></textarea>
@@ -375,9 +476,9 @@
 		</form>
 		</div>
 	</div>
-	
 
-      <div class="panel panel-primary"  id="results-form" style="display:none;border-color:#6c4a96 !important"> 
+
+      <div class="panel panel-primary"  id="results-form" style="display:none;border-color:#6c4a96 !important">
 		  <div class="panel-heading" style="background-color:#6c4a96 !important;border-color:#6c4a96 !important">
 		    <h3 class="panel-title">Resultados de Busca</h3>
 		  </div>
@@ -386,7 +487,7 @@
 		  </div>
 	</div>
 
-	<div class="panel panel-primary"  id="online-users" style="width:200px;right: 0 !important;bottom: 0;position: absolute; margin-right:10px;border-color:#6c4a96 !important"> 
+	<div class="panel panel-primary"  id="online-users" style="width:200px;right: 0 !important;bottom: 0;position: absolute; margin-right:10px;border-color:#6c4a96 !important">
 		  <div class="panel-heading" style="background-color:#6c4a96 !important;border-color:#6c4a96 !important">
 		    <h3 class="panel-title">Usuários Online</h3>
 		  </div>
@@ -395,7 +496,7 @@
 		  </div>
 	</div>
 
-	<div class="panel panel-primary name-panel"  id="online-users" style="width: 600px !important; display:none;border-color:#6c4a96 !important"> 
+	<div class="panel panel-primary name-panel"  id="online-users" style="width: 600px !important; display:none;border-color:#6c4a96 !important">
 		<div class="panel-heading" style="background-color:#6c4a96 !important;border-color:#6c4a96 !important">
 		    <h3 class="panel-title">Por favor, informe ou atualize seu username (ou permaneça anônimo)</h3>
 		  </div>
@@ -407,14 +508,14 @@
     </div><!-- /input-group -->
 	</div>
 
-	
 
 
 
-	
+
+
 
 </body>
 
 <div>
-	
+
 </html>
