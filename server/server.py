@@ -14,6 +14,7 @@ from datetime import datetime
 from song import Song
 from radio_config import RADIO_ROOT, SERVER_URL, ICES_PID, STATUS_PAGE, ICES_PIPE
 from xml.dom import minidom
+from logger import setup_logger
 
 app = Flask(__name__)
 
@@ -24,13 +25,14 @@ current_status = {'satisfaction' : 0.5, 'song': '', 'last_song':'', 'listeners':
 LISTENERS_IDX = 14
 PLAYING_IDX = 16
 
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
-                    datefmt='%m-%d %H:%M',
-                    filename='/tmp/logs/ices.log',
-                    filemode='a')
+setup_logger('feedback-logger', 'logs/feedback.log')
+setup_logger('vote-logger', 'logs/vote.log')
+setup_logger('interpose-logger', 'logs/interpose.log')
+setup_logger('suggestion-logger', 'logs/suggestion.log')
 
-LOGGER = logging.getLogger('radio-ices')
+FEEDBACK_LOGGER = logging.getLogger('feedback-logger')
+VOTE_LOGGER = logging.getLogger('vote-logger')
+INTERPOSE_LOGGER = logging.getLogger('interpose-logger')
 
 def get_online_users():
     current = int(time.time()) // 60
@@ -88,15 +90,14 @@ def busca_resultados():
     url = "http://gdata.youtube.com/feeds/api/videos?%s" % params
     global current_results
     current_results = simplejson.load(urllib.urlopen(url))
-    LOGGER.info(url)
     return simplejson.dumps(current_results)
 
 @app.route('/perform_vote', methods= ["POST"])
 def perform_vote():
+    # Quem sugeriu, o que sugeriu, quando sugeriu
     index = request.json["index"]
     item = current_results['data']['items'][int(index)]
     video_json = simplejson.dumps({"id": item['id'], "title": item['title']})
-    LOGGER.info(video_json)
     radio_utils.append(radio_utils.get_path(RADIO_ROOT, 'to_process_votes'),
                           video_json)
     return simplejson.dumps(current_status)
@@ -118,11 +119,15 @@ def vote_song():
 
 @app.route('/feedback', methods= ["POST"])
 def feedback():
+    
+    
     feedback_type = request.json["feedback_type"]
     if feedback_type == "woot":
         current_status["positive_votes"] += 1
     else:
         current_status["negative_votes"] += 1
+    # Quem deu feedback, como deu, quando deu
+    FEEDBACK_LOGGER.info("%s %s" % (get_user(request), feedback_type))
 
     update_satisfaction()
     return simplejson.dumps(current_status)
@@ -150,10 +155,8 @@ def update_satisfaction():
     satisfaction = float(current_status["positive_votes"] - current_status["negative_votes"]) / float(max(len(get_online_users()),1))
     satisfaction = (satisfaction + 1) / 2
 
-    LOGGER.info("satisfaction")
-    LOGGER.info(satisfaction)
-
     if (satisfaction < 0.25):
+        # Quem foi vetado, Quando foi vetado (Extrair quantas vezes foi vetado)
         skip_song()
 
 @app.route('/status')
@@ -232,7 +235,6 @@ def update_status():
         current_status['listeners'] = 1
         return
 
-    LOGGER.info(status_list)
     current_song = open("current_song","r")
     current_status['song'] = current_song.read()
     current_song.close()
@@ -264,6 +266,15 @@ def get_online_users():
         if len(user) > 1:
             users.append(user.split(" ")[1])
     return users
+
+def get_user(request):
+    ip = request.remote_addr
+    users_file = open("users","r")
+    for user in users_file.readlines():
+        if len(user) > 0 and user.split(" ")[0] == ip:
+            return user.split(" ")[1]
+    users_file.close()
+    return None
 
 def get_applicant_titles():
     list = []
