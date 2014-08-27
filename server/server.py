@@ -33,6 +33,7 @@ setup_logger('suggestion-logger', 'logs/suggestion.log')
 FEEDBACK_LOGGER = logging.getLogger('feedback-logger')
 VOTE_LOGGER = logging.getLogger('vote-logger')
 INTERPOSE_LOGGER = logging.getLogger('interpose-logger')
+SUGGESTION_LOGGER = logging.getLogger('suggestion-logger')
 
 def get_online_users():
     current = int(time.time()) // 60
@@ -100,6 +101,7 @@ def perform_vote():
     video_json = simplejson.dumps({"id": item['id'], "title": item['title']})
     radio_utils.append(radio_utils.get_path(RADIO_ROOT, 'to_process_votes'),
                           video_json)
+    SUGGESTION_LOGGER.info("%s | %s" % (get_user(request).rstrip(), item['title'].rstrip()))
     return simplejson.dumps(current_status)
 
 @app.route('/vote_song', methods= ["POST"])
@@ -115,19 +117,18 @@ def vote_song():
     active_songs[index].balance = active_songs[index].up_votes - active_songs[index].down_votes
     active_songs.sort(key=lambda Song: Song.balance, reverse=True)
     update_file(active_songs)
+    VOTE_LOGGER.info("%s | %s" % (get_user(request).rstrip(), vote_type.rstrip()))
     return simplejson.dumps({"applicant_songs": get_applicant_titles()})
 
 @app.route('/feedback', methods= ["POST"])
-def feedback():
-    
-    
+def feedback():    
     feedback_type = request.json["feedback_type"]
     if feedback_type == "woot":
         current_status["positive_votes"] += 1
     else:
         current_status["negative_votes"] += 1
     # Quem deu feedback, como deu, quando deu
-    FEEDBACK_LOGGER.info("%s %s" % (get_user(request), feedback_type))
+    FEEDBACK_LOGGER.info("%s | %s" % (get_user(request).rstrip(), feedback_type.rstrip()))
 
     update_satisfaction()
     return simplejson.dumps(current_status)
@@ -140,9 +141,7 @@ def get_vote(token):
         if (token in like_votes):
             vote = 'like'
     return vote
-
-
-
+    
 def update_satisfaction():
     def skip_song():
         f = open(ICES_PID, 'r')
