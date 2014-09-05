@@ -1,6 +1,7 @@
 <html>
 
 <head>
+	<link rel="icon" type="image/png" href="static/img/listening.png">
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 	<link href="static/bootstrap-3.2.0-dist/css/bootstrap.min.css" rel="stylesheet">
 	<link href="static/bootstrap-3.2.0-dist/css/custom.css" rel="stylesheet">
@@ -288,7 +289,7 @@
 
                 	$('.lista-resultados').html("")
 
-                	for(i = 0; i<10;i++) {
+                	for(i = 0; i<json["data"]["items"].length;i++) {
                 		$('.lista-resultados').html($('.lista-resultados').html() + "<a href='#'' class='list-group-item list-group-item2' style=border-color:grey !important;'  onClick=selectSong(" +i+ ")><img style='margin-right: 10px;' src='" + json["data"]["items"][i]["thumbnail"]["hqDefault"] + "' alt='Smiley face' width='50' height='50'>" +  json["data"]["items"][i]["title"] + "</a>");
                 	}
 
@@ -377,7 +378,7 @@
 
 </head>
 
-<body style="font-family: Trebuchet MS; background-image: url('static/img/background.jpg');background-size: 100% 100%;";>
+<body style="background-image: url('static/img/background.jpg');background-size: 100% 100%;";>
 	<div class='notifications bottom-right'></div>
 
 	<!-- Navigation -->
@@ -459,7 +460,7 @@
 		<center style="margin-top: 50px">
 		<div class="panel panel-primary"  style="width: 500px !important;border-color:#6c4a96 !important">
 			  <div class="panel-heading" style="background-color:#6c4a96 !important;border-color:#6c4a96 !important">
-			    <h3 class="panel-title">Fila de execução</h3>
+			    <h3 class="panel-title">Escolha a próxima música!</h3>
 			  </div>
 
 			  <div class="list-group applicants_table">
@@ -478,7 +479,7 @@
 	</div>
 
 
-      <div class="panel panel-primary"  id="results-form" style="display:none;border-color:#6c4a96 !important">
+      <div class="panel panel-primary"  id="results-form" style="display:none;border-color:#6c4a96 !important;overflow-y: scroll; height: 500px">
 		  <div class="panel-heading" style="background-color:#6c4a96 !important;border-color:#6c4a96 !important">
 		    <h3 class="panel-title">Resultados de Busca</h3>
 		  </div>
@@ -507,13 +508,6 @@
       </span>
     </div><!-- /input-group -->
 	</div>
-
-
-
-
-
-
-
 </body>
 
 <div>

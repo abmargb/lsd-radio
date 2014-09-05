@@ -84,11 +84,15 @@ def normalize_users_file():
 def busca_resultados():
     vote = request.form["vote"]
     session['vote'] = vote
-    params = urllib.urlencode({'q': vote.encode('utf-8'), 'max-results': '10', 'v': '2', 'alt': 'jsonc'})
+    params = urllib.urlencode({'q': vote.encode('utf-8'), 'max-results': '30', 'v': '2', 'alt': 'jsonc',"orderby":"viewCount"})
     url = "http://gdata.youtube.com/feeds/api/videos?%s" % params
     global current_results
     current_results = simplejson.load(urllib.urlopen(url))
-    LOGGER.info(url)
+    for song in current_results["data"]["items"]:
+        if int(song["duration"]) > 480:
+            LOGGER.info("achei um")
+            current_results["data"]["items"].remove(song)
+
     return simplejson.dumps(current_results)
 
 @app.route('/perform_vote', methods= ["POST"])
