@@ -93,7 +93,6 @@ def busca_resultados():
     current_results = simplejson.load(urllib.urlopen(url))
     for song in current_results["data"]["items"]:
         if int(song["duration"]) > 480:
-            LOGGER.info("achei um")
             current_results["data"]["items"].remove(song)
 
     return simplejson.dumps(current_results)

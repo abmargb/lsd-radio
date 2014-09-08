@@ -211,12 +211,14 @@
 			$(".name-panel").bPopup({
 			            speed: 650,
 			            transition: 'slideIn',
-				   		transitionClose: 'slideBack'
+				   		transitionClose: 'slideBack',
+				   		modalClose: false
 			        });
 
 			$( ".btn-send-name" ).click(function() {
 				username = $(".username").val();
-				$.ajax({
+				if(username.length > 0) {
+					$.ajax({
 	  				url: "/define_name",
 	  				contentType: "application/json; charset=utf-8",
 	  				type: "POST",
@@ -226,6 +228,11 @@
 	 					$(".name-panel").bPopup().close();
 	  				}
 				});
+				}
+				else {
+					alert("Por favor, forneça uma identificação")
+				}
+				
 			});
 
 			$(".song_entry").live("click", function (e) {
@@ -327,7 +334,7 @@
 
 			$('.username').keypress(function (e) {
 			  if (e.which == 13) {
-			  		e.preventDefault()
+			  		e.preventDefault();
 	                username = $(".username").val();
 		                if (username.length > 0) {
 		                	$.ajax({
@@ -343,7 +350,7 @@
 	                }
 
 	                else {
-	                	$(".name-panel").bPopup().close();
+	                	alert("Por favor, forneça uma identificação");
 	                }
 
 			  }
@@ -412,7 +419,7 @@
                 </div>
 
                 <div class="btn-group" style="float:right; margin-top: 65px; right:0;position:fixed">
-                	<div style="color:white;font-size:15px;">Qualidade das músicas tocadas</div>
+                	<div style="color:white;font-size:15px;">Satisfação com músicas tocadas</div>
 				  <div class="rad">
 				    <label for="my_radio_button_1">Ruim</label>
 				    <input type="radio" name="radio" id="my_radio_button_1" />
@@ -524,7 +531,7 @@
 
 	<div class="panel panel-primary name-panel"  id="online-users" style="width: 600px !important; display:none;border-color:#6c4a96 !important">
 		<div class="panel-heading" style="background-color:#6c4a96 !important;border-color:#6c4a96 !important">
-		    <h3 class="panel-title">Por favor, informe ou atualize seu username (ou permaneça anônimo)</h3>
+		    <h3 class="panel-title">Por favor, informe ou atualize seu username</h3>
 		  </div>
 		  <div class="input-group">
       <input type="text" class="form-control username" placeholder="Anônimo">
