@@ -1,11 +1,12 @@
 class Song:
-	def __init__(self, id, title):
+	def __init__(self, id, title, user):
 		self.id = id
 		self.title = title
 		self.up_votes = 0
 		self.down_votes = 0
 		self.balance = 0
 		self.path = ''
+		self.user = user
 
 	def up_vote(self):
 		self.up_vote += 1

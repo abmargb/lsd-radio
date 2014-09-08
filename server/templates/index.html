@@ -111,7 +111,8 @@
 		}
 
 		function updateCurrentSong(song) {
-			$('#current-song').html("<blink>" + song + "</blink>");
+			$('#current-song').html("<blink>" + song.split("|")[0] + "</blink>");
+			$('#current-player').html("por: " + song.split("|")[1]);
 		}
 
 		function updateApplicantsTable(list) {
@@ -419,6 +420,7 @@
             			<img class="navbar-brand" src="static/img/playing.png" style="width:60px; height:60px; margin-top: -5px !important; margin-left: 10px;">
 	                	<a class="navbar-brand">Ouvindo agora:</a>
 	                	<a class="navbar-brand" id="current-song">Start Bootstrap</a>
+	                	<a class="navbar-brand" id="current-player" style="font-weight: bold;font-size: 14px !important; margin-top: 10px !important; margin-left:-25px !important; color: white !important">por: felipe</a>
 	                	<input class="navbar-brand feedback-woot" type="image" title="Curti!" src="static/img/woot.png" style="width:60px; height:60px; margin-top: -5px !important;-webkit-appearance: none;"/>
 	                	<span class="badge navbar-brand woot-count" style="margin-left:-25px !important; margin-top:5px !important; font-size: 15px !important; height:20px !important;">15</span>
 	                	<input class="navbar-brand feedback-meh" type="image" title="Curti!" src="static/img/meh.png" style="width:60px; height:60px; margin-top: -5px !important;">
@@ -431,8 +433,8 @@
             		<a class="navbar-brand">Sem músicas para executar</a>
                 </div>
 
-                <div id="widget-satisfaction" class="btn-group" style="float:right; margin-top: 65px; right:0;position:fixed">
-                	<div style="color:white;font-size:25px;">Satisfação com músicas tocadas</div>
+                <div id="widget-satisfaction" class="btn-group" style="float:right; margin-top: 205px; right:0;position:fixed; margin-right:10px">
+                	<div style="color:white;font-size:20px;">Satisfação com músicas tocadas</div>
 				  <div class="rad">
 				    <label for="my_radio_button_1">Nenhuma</label>
 				    <input type="radio" name="radio" id="my_radio_button_1" onClick="sendSatisfaction(1)" />

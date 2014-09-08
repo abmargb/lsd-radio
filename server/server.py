@@ -104,7 +104,7 @@ def perform_vote():
     # Quem sugeriu, o que sugeriu, quando sugeriu
     index = request.json["index"]
     item = current_results['data']['items'][int(index)]
-    video_json = simplejson.dumps({"id": item['id'], "title": item['title']})
+    video_json = simplejson.dumps({"id": item['id'], "title": item['title'], "user" : get_user(request).rstrip()})
     radio_utils.append(radio_utils.get_path(RADIO_ROOT, 'to_process_votes'),
                           video_json)
     SUGGESTION_LOGGER.info("%s | %s" % (get_user(request).rstrip(), item['title'].rstrip()))
@@ -168,6 +168,7 @@ def update_satisfaction():
 
     if (satisfaction < 0.25):
         # Quem foi vetado, Quando foi vetado (Extrair quantas vezes foi vetado)
+        INTERPOSE_LOGGER.info("%s" % (get_current_player()))
         skip_song()
 
 @app.route('/status')
@@ -261,7 +262,7 @@ def get_applicant_songs():
     applicants = []
     for song in songs.readlines():
         unpickled = jsonpickle.decode(song)
-        song = Song(unpickled["id"], unpickled["title"])
+        song = Song(unpickled["id"], unpickled["title"], unpickled["user"])
         song.up_votes = unpickled["up_votes"]
         song.down_votes = unpickled["down_votes"]
         song.balance = song.up_votes - song.down_votes
@@ -298,6 +299,12 @@ def update_file(active_songs):
     for song in active_songs:
         songs.write(jsonpickle.encode(song) + "\n")
     songs.close()
+
+def get_current_player():
+    current_song = open("current_song","r")
+    player = current_song.read().split("|")[1]
+    current_song.close()
+    return player
 
 def check_newsong():
     while (True):

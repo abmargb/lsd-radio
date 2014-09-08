@@ -17,10 +17,11 @@ def ices_get_next():
         pipe.write('1')
         pipe.close()
         json_obj = radio_utils.poll(real_path('processed_votes'))
+        LOGGER.info(json_obj)
         if json_obj: 
             obj = jsonpickle.decode(json_obj)
             current_song = open("current_song", "w")
-            current_song.write(obj["title"].encode("UTF-8"))
+            current_song.write("%s|%s" % (obj["title"].encode("UTF-8"),obj["user"].encode("UTF-8")))
             current_song.close()
             return obj["path"]
         time.sleep(2)

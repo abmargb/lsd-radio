@@ -29,15 +29,16 @@ FFMPEG_LINE = 'youtube-dl http://www.youtube.com/watch?v=%s -q -o /dev/stdout | 
 def real_path(path):
     return radio_utils.get_path(RADIO_ROOT, path)
 
-def convert_video(vote_id, vote_name):
+def convert_video(vote_id, vote_name, vote_user):
 	print "FFMPEG Conversion: %s" % (FFMPEG_LINE % (vote_id, MP3CACHE_ROOT, vote_id))
 	os.system(FFMPEG_LINE % (vote_id, MP3CACHE_ROOT, vote_id))
-	song = Song(vote_id, vote_name)
+	song = Song(vote_id, vote_name, vote_user)
 	song.path = os.path.join(MP3CACHE_ROOT, "%s.mp3" % (vote_id))
 	unpickled = jsonpickle.encode(song)
 	radio_utils.append(real_path('processed_votes'), unpickled)
 
-if __name__ == "__main__":
-	vote_id = sys.argv[1]
-	vote_name = sys.argv[2]
-	convert_video(vote_id, vote_name)
+
+vote_id = sys.argv[1]
+vote_name = sys.argv[2]
+vote_user = sys.argv[3]
+convert_video(vote_id, vote_name, vote_user)
