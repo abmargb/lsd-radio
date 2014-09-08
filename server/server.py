@@ -29,11 +29,13 @@ setup_logger('feedback-logger', 'logs/feedback.log')
 setup_logger('vote-logger', 'logs/vote.log')
 setup_logger('interpose-logger', 'logs/interpose.log')
 setup_logger('suggestion-logger', 'logs/suggestion.log')
+setup_logger('satisfaction-logger', 'logs/satisfaction.log')
 
 FEEDBACK_LOGGER = logging.getLogger('feedback-logger')
 VOTE_LOGGER = logging.getLogger('vote-logger')
 INTERPOSE_LOGGER = logging.getLogger('interpose-logger')
 SUGGESTION_LOGGER = logging.getLogger('suggestion-logger')
+SATISFACTION_LOGGER = logging.getLogger('satisfaction-logger')
 
 def get_online_users():
     current = int(time.time()) // 60
@@ -136,6 +138,12 @@ def feedback():
 
     update_satisfaction()
     return simplejson.dumps(current_status)
+
+@app.route('/satisfaction', methods= ["POST"])
+def satisfaction():
+    satisfaction = request.json["satisfaction"]
+    SATISFACTION_LOGGER.info("%s | %s" % (get_user(request).rstrip(), satisfaction))
+    return simplejson.dumps("")
 
 def get_vote(token):
     vote = 'none'
