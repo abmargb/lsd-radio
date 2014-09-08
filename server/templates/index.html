@@ -194,6 +194,19 @@
 		    });
 		}
 
+		function sendSatisfaction(i) {
+			$.ajax({
+	  				url: "/satisfaction",
+	  				contentType: "application/json; charset=utf-8",
+	  				type: "POST",
+	  				dataType: "json",
+	  				data: JSON.stringify({"satisfaction":i}, null, '\t'),
+	 				success: function(jqXHR){
+	 					$("#widget-satisfaction").css("display","none");
+	  				}
+				});
+		}
+
 
 
 		$(document).ready(function() {
@@ -411,27 +424,27 @@
             		<a class="navbar-brand">Sem músicas para executar</a>
                 </div>
 
-                <div class="btn-group" style="float:right; margin-top: 65px; right:0;position:fixed">
-                	<div style="color:white;font-size:15px;">Qualidade das músicas tocadas</div>
+                <div id="widget-satisfaction" class="btn-group" style="float:right; margin-top: 65px; right:0;position:fixed">
+                	<div style="color:white;font-size:25px;">Satisfação com músicas tocadas</div>
 				  <div class="rad">
-				    <label for="my_radio_button_1">Ruim</label>
-				    <input type="radio" name="radio" id="my_radio_button_1" />
+				    <label for="my_radio_button_1">Nenhuma</label>
+				    <input type="radio" name="radio" id="my_radio_button_1" onClick="sendSatisfaction(1)" />
 				</div>
 				<div class="rad">
-				    <label for="my_radio_button_2">Razoável</label>
-				    <input type="radio" name="radio" id="my_radio_button_2" />
+				    <label for="my_radio_button_2">Pouca</label>
+				    <input type="radio" name="radio" id="my_radio_button_2" onClick="sendSatisfaction(2)" />
 				</div>
 				<div class="rad">
-				    <label for="my_radio_button_3">Normal</label>
-				    <input type="radio" name="radio" id="my_radio_button_3" />
+				    <label for="my_radio_button_3">Média</label>
+				    <input type="radio" name="radio" id="my_radio_button_3" onClick="sendSatisfaction(3)" />
 				</div>
 				<div class="rad">
-				    <label for="my_radio_button_4">Boa</label>
-				    <input type="radio" name="radio" id="my_radio_button_4" />
+				    <label for="my_radio_button_4">Alta</label>
+				    <input type="radio" name="radio" id="my_radio_button_4" onClick="sendSatisfaction(4)" />
 				</div>
 				<div class="rad">
-				    <label for="my_radio_button_4">Ótima</label>
-				    <input type="radio" name="radio" id="my_radio_button_4" />
+				    <label for="my_radio_button_4">Máxima</label>
+				    <input type="radio" name="radio" id="my_radio_button_4" onClick="sendSatisfaction(5)" />
 				</div>
 
 				</div>
