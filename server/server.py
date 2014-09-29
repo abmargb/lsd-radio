@@ -261,12 +261,15 @@ def get_applicant_songs():
     songs = open(radio_utils.get_path(RADIO_ROOT, 'processed_votes'), "r")
     applicants = []
     for song in songs.readlines():
+	SUGGESTION_LOGGER.info("song")
+	SUGGESTION_LOGGER.info(song)
         unpickled = jsonpickle.decode(song)
-        song = Song(unpickled["id"], unpickled["title"], unpickled["user"])
-        song.up_votes = unpickled["up_votes"]
-        song.down_votes = unpickled["down_votes"]
-        song.balance = song.up_votes - song.down_votes
-        song.path = unpickled["path"]
+	SUGGESTION_LOGGER.info(unpickled)
+        song = Song(unpickled.id, unpickled.title, unpickled.user)
+        song.up_votes = unpickled.up_votes
+        song.down_votes = unpickled.down_votes
+	song.balance = song.up_votes - song.down_votes
+        song.path = unpickled.path
         applicants.append(song)
     songs.close()
     return applicants
