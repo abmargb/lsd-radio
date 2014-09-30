@@ -98,7 +98,7 @@ def perform_vote():
     # Quem sugeriu, o que sugeriu, quando sugeriu
     index = request.json["index"]
     item = current_results['data']['items'][int(index)]
-    video_json = simplejson.dumps({"id": item['id'], "title": item['title'], "user" : get_user(request).rstrip()})
+    video_json = simplejson.dumps({"id": item['id'], "title": item['title'], "user" : session["current_user"].rstrip()})
     radio_utils.append(radio_utils.get_path(RADIO_ROOT, 'to_process_votes'),
                           video_json)
     SUGGESTION_LOGGER.info("%s | %s" % (session["current_user"], item['title'].rstrip()))
@@ -117,7 +117,7 @@ def vote_song():
     active_songs[index].balance = active_songs[index].up_votes - active_songs[index].down_votes
     active_songs.sort(key=lambda Song: Song.balance, reverse=True)
     update_file(active_songs)
-    VOTE_LOGGER.info("%s | %s" % (get_user(request).rstrip(), vote_type.rstrip()))
+    VOTE_LOGGER.info("%s | %s" % (session["current_user"].rstrip(), vote_type.rstrip()))
     return simplejson.dumps({"applicant_songs": get_applicant_titles()})
 
 @app.route('/feedback', methods= ["POST"])
@@ -128,7 +128,7 @@ def feedback():
     else:
         current_status["negative_votes"] += 1
     # Quem deu feedback, como deu, quando deu
-    FEEDBACK_LOGGER.info("%s | %s" % (get_user(request).rstrip(), feedback_type.rstrip()))
+    FEEDBACK_LOGGER.info("%s | %s" % (session["current_user"].rstrip(), feedback_type.rstrip()))
 
     update_satisfaction()
     return simplejson.dumps(current_status)
@@ -136,7 +136,7 @@ def feedback():
 @app.route('/satisfaction', methods= ["POST"])
 def satisfaction():
     satisfaction = request.json["satisfaction"]
-    SATISFACTION_LOGGER.info("%s | %s" % (get_user(request).rstrip(), satisfaction))
+    SATISFACTION_LOGGER.info("%s | %s" % (session["current_user"].rstrip(), satisfaction))
     return simplejson.dumps("")
 
 def get_vote(token):
@@ -257,6 +257,7 @@ def get_applicant_songs():
     for song in songs.readlines():
         unpickled = jsonpickle.decode(song)
         SUGGESTION_LOGGER.info("unpickled")
+        SUGGESTION_LOGGER.info(unpickled)
         song = Song(unpickled["id"], unpickled["title"], unpickled["user"])
         song.up_votes = unpickled["up_votes"]
         song.down_votes = unpickled["down_votes"]
@@ -273,15 +274,6 @@ def get_online_users():
         if len(user) > 1:
             users.append(user.split(" ")[1])
     return users
-
-def get_user(request):
-    ip = request.remote_addr
-    users_file = open("users","r")
-    for user in users_file.readlines():
-        if len(user) > 0 and user.split(" ")[0] == ip:
-            return user.split(" ")[1]
-    users_file.close()
-    return None
 
 def get_applicant_titles():
     list = []
