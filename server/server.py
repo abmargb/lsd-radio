@@ -9,14 +9,20 @@ import random
 import time
 import jsonpickle
 import time
+import redis
+
 from datetime import datetime
 
 from song import Song
 from radio_config import RADIO_ROOT, SERVER_URL, ICES_PID, STATUS_PAGE, ICES_PIPE
 from xml.dom import minidom
 from logger import setup_logger
+from flask_kvsession import KVSessionExtension
+from simplekv.memory.redisstore import RedisStore
 
+store = RedisStore(redis.StrictRedis())
 app = Flask(__name__)
+KVSessionExtension(store, app)
 
 unlike_votes = []
 like_votes = []
@@ -85,19 +91,19 @@ def busca_resultados():
     session['vote'] = vote
     params = urllib.urlencode({'q': vote.encode('utf-8'), 'max-results': '30', 'v': '2', 'alt': 'jsonc',"orderby":"viewCount"})
     url = "http://gdata.youtube.com/feeds/api/videos?%s" % params
-    global current_results
-    current_results = simplejson.load(urllib.urlopen(url))
-    for song in current_results["data"]["items"]:
+    session["current_results"] = simplejson.load(urllib.urlopen(url))
+    for song in session["current_results"]["data"]["items"]:
         if int(song["duration"]) > 480:
-            current_results["data"]["items"].remove(song)
+            session["current_results"]["data"]["items"].remove(song)
+    session.modified
 
-    return simplejson.dumps(current_results)
+    return simplejson.dumps(session["current_results"])
 
 @app.route('/perform_vote', methods= ["POST"])
 def perform_vote():
     # Quem sugeriu, o que sugeriu, quando sugeriu
     index = request.json["index"]
-    item = current_results['data']['items'][int(index)]
+    item = session["current_results"]['data']['items'][int(index)]
     video_json = simplejson.dumps({"id": item['id'], "title": item['title'], "user" : session["current_user"].rstrip()})
     radio_utils.append(radio_utils.get_path(RADIO_ROOT, 'to_process_votes'),
                           video_json)
@@ -315,7 +321,7 @@ if __name__ == '__main__':
     th=Thread(target=check_newsong)
     th.start()
     update_status()
-
+        
     logging.basicConfig(level=logging.INFO, format='%(levelname)-8s %(message)s')
     app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
     app.run(host='0.0.0.0')
