@@ -256,13 +256,16 @@ def get_applicant_songs():
     applicants = []
     for song in songs.readlines():
         unpickled = jsonpickle.decode(song)
-        SUGGESTION_LOGGER.info("unpickled")
-        SUGGESTION_LOGGER.info(unpickled)
-        song = Song(unpickled["id"], unpickled["title"], unpickled["user"])
-        song.up_votes = unpickled["up_votes"]
-        song.down_votes = unpickled["down_votes"]
+        #song = Song(unpickled["id"], unpickled["title"], unpickled["user"])
+        #song.up_votes = unpickled["up_votes"]
+        #song.down_votes = unpickled["down_votes"]
+        #song.balance = song.up_votes - song.down_votes
+        #song.path = unpickled["path"]
+        song = Song(unpickled.id, unpickled.title, unpickled.user)
+        song.up_votes = unpickled.up_votes
+        song.down_votes = unpickled.down_votes
         song.balance = song.up_votes - song.down_votes
-        song.path = unpickled["path"]
+        song.path = unpickled.path
         applicants.append(song)
     songs.close()
     return applicants
