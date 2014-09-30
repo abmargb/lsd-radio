@@ -37,16 +37,10 @@ INTERPOSE_LOGGER = logging.getLogger('interpose-logger')
 SUGGESTION_LOGGER = logging.getLogger('suggestion-logger')
 SATISFACTION_LOGGER = logging.getLogger('satisfaction-logger')
 
-def get_online_users():
-    current = int(time.time()) // 60
-    minutes = xrange(5)
-    redis = Redis()
-    return redis.sunion(['online-users/%d' % (current - x)
-                         for x in minutes])
-
 @app.route('/define_name', methods=["POST"])
 def define_name():
     update_user_file(request.remote_addr,request.json["username"])
+    session["current_user"] = request.json["username"]
     return simplejson.dumps("")
 
 def update_user_file(addr, username):
@@ -107,7 +101,7 @@ def perform_vote():
     video_json = simplejson.dumps({"id": item['id'], "title": item['title'], "user" : get_user(request).rstrip()})
     radio_utils.append(radio_utils.get_path(RADIO_ROOT, 'to_process_votes'),
                           video_json)
-    SUGGESTION_LOGGER.info("%s | %s" % (get_user(request).rstrip(), item['title'].rstrip()))
+    SUGGESTION_LOGGER.info("%s | %s" % (session["current_user"], item['title'].rstrip()))
     return simplejson.dumps(current_status)
 
 @app.route('/vote_song', methods= ["POST"])
@@ -261,15 +255,13 @@ def get_applicant_songs():
     songs = open(radio_utils.get_path(RADIO_ROOT, 'processed_votes'), "r")
     applicants = []
     for song in songs.readlines():
-	SUGGESTION_LOGGER.info("song")
-	SUGGESTION_LOGGER.info(song)
         unpickled = jsonpickle.decode(song)
-	SUGGESTION_LOGGER.info(unpickled)
-        song = Song(unpickled.id, unpickled.title, unpickled.user)
-        song.up_votes = unpickled.up_votes
-        song.down_votes = unpickled.down_votes
-	song.balance = song.up_votes - song.down_votes
-        song.path = unpickled.path
+        SUGGESTION_LOGGER.info("unpickled")
+        song = Song(unpickled["id"], unpickled["title"], unpickled["user"])
+        song.up_votes = unpickled["up_votes"]
+        song.down_votes = unpickled["down_votes"]
+        song.balance = song.up_votes - song.down_votes
+        song.path = unpickled["path"]
         applicants.append(song)
     songs.close()
     return applicants
@@ -329,9 +321,6 @@ if __name__ == '__main__':
     th.start()
     update_status()
 
-    th2=Thread(target=reset_ping_file)
-    th2.start()
-
     logging.basicConfig(level=logging.INFO, format='%(levelname)-8s %(message)s')
-    app.config["SECRET_KEY"] = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+    app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
     app.run(host='0.0.0.0')
