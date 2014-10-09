@@ -135,7 +135,7 @@ def feedback():
         current_status["negative_votes"] += 1
     # Quem deu feedback, como deu, quando deu
     FEEDBACK_LOGGER.info("%s | %s" % (session["current_user"].rstrip(), feedback_type.rstrip()))
-
+    session["provided_feedback_this_round"] = True
     update_satisfaction()
     return simplejson.dumps(current_status)
 
@@ -177,8 +177,12 @@ def status():
     active_songs = get_applicant_songs()
     active_songs.sort(key=lambda Song: Song.balance, reverse=True)
     update_file(active_songs)
-    if (current_status['song'] != current_status['last_song']):
-        current_status['last_song'] = current_status['song']
+    session['song'] = get_current_song()
+    SUGGESTION_LOGGER.info("Aqui o atual: " + session['song'])
+    SUGGESTION_LOGGER.info("Aqui o antigo: " + session['song'])
+    if (session['song'] != session['last_song']):
+        session['last_song'] = session['song']
+        session['provided_feedback_this_round'] = False
         current_status["positive_votes"] = 0
         current_status["negative_votes"] = 0
         changed_song_this_round = True
@@ -188,7 +192,8 @@ def status():
     return simplejson.dumps({"vote": get_vote(token), "current_song": current_status['song'],
                              "satisfaction": current_status['satisfaction'], "applicant_songs": get_applicant_titles(), "online_users": get_online_users(),
                              "positive_votes": current_status["positive_votes"], "negative_votes": current_status["negative_votes"],
-                             "changed_song_this_round":changed_song_this_round})
+                             "provided_feedback_this_round":session["provided_feedback_this_round"], "changed_song_this_round": changed_song_this_round,
+                             "current_user":session.get("current_user", False)})
 
 @app.route('/like')
 def like():
@@ -222,7 +227,6 @@ def index():
 
     if (not token) :
         resp.set_cookie('token', id_generator())
-
     return resp
 
 def update_song():
@@ -252,6 +256,12 @@ def update_status():
     current_song.close()
     current_status['listeners'] = int(status_list[LISTENERS_IDX])
 
+def get_current_song():
+    current_song = open("current_song","r")
+    song = current_song.read()
+    current_song.close()
+    return song
+
 def update_ping_file(address):
     users_file = open("ping","a")
     users_file.write("%s\n" % (address))
@@ -262,16 +272,16 @@ def get_applicant_songs():
     applicants = []
     for song in songs.readlines():
         unpickled = jsonpickle.decode(song)
-        #song = Song(unpickled["id"], unpickled["title"], unpickled["user"])
-        #song.up_votes = unpickled["up_votes"]
-        #song.down_votes = unpickled["down_votes"]
-        #song.balance = song.up_votes - song.down_votes
-        #song.path = unpickled["path"]
-        song = Song(unpickled.id, unpickled.title, unpickled.user)
-        song.up_votes = unpickled.up_votes
-        song.down_votes = unpickled.down_votes
+        song = Song(unpickled["id"], unpickled["title"], unpickled["user"])
+        song.up_votes = unpickled["up_votes"]
+        song.down_votes = unpickled["down_votes"]
         song.balance = song.up_votes - song.down_votes
-        song.path = unpickled.path
+        song.path = unpickled["path"]
+        #song = Song(unpickled.id, unpickled.title, unpickled.user)
+        #song.up_votes = unpickled.up_votes
+        #song.down_votes = unpickled.down_votes
+        #song.balance = song.up_votes - song.down_votes
+        #song.path = unpickled.path
         applicants.append(song)
     songs.close()
     return applicants
@@ -321,7 +331,10 @@ if __name__ == '__main__':
     th=Thread(target=check_newsong)
     th.start()
     update_status()
-        
+
     logging.basicConfig(level=logging.INFO, format='%(levelname)-8s %(message)s')
     app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
     app.run(host='0.0.0.0')
+    session["provided_feedback_this_round"] = False
+    session["song"] = ''
+    session["last_song"] = ''

@@ -111,15 +111,18 @@
 		}
 
 		function updateCurrentSong(song) {
-			$('#current-song').html("<blink>" + song.split("|")[0] + "</blink>");
-			$('#current-player').html("por: " + song.split("|")[1]);
+			if (song.length != "Sem musicas pra tocar") {
+				console.log(JSON.parse(song));
+				$('#current-song').html(JSON.parse(song).song);
+				$('#current-player').html(JSON.parse(song).author);
+			}
 		}
 
 		function updateApplicantsTable(list) {
 			table2 = $(".applicants_table")
 			table2.html("")
 			for (var i = 0; i < list.length; i++) {
-				table2.html(table2.html() + "<a style='font-size: 15px;' href='#'' class='list-group-item " + getMarkCss(i) + "'>" + list[i]  +  "<div style='margin-left:20px;''></div><input " + getVotedCss(list[i]) +  " type='image' value='Vote DOWN' class='song_entry down entry-" + i + " btn btn-danger' src='static/img/down.png' style='width:40px; height: 30px;margin-top:5px;''></td><td width='10px'><input " + getVotedCss(list[i]) + " type='image' class='song_entry up entry-" + i + " btn btn-success' src='static/img/up.png' style='margin-left:5px; margin-top:5px; width:40px; height: 30px'></td></tr><tr></a>" )
+				table2.html(table2.html() + "<a style='font-size: 10px; font-weight:bold' href='#'' class='list-group-item " + getMarkCss(i) + "'>" + list[i]  +  "<div style='margin-left:20px;''></div><input " + getVotedCss(list[i]) +  " type='image' value='Vote DOWN' class='song_entry down entry-" + i + " btn btn-danger' src='static/img/down.png' style='width:40px; height: 30px;margin-top:5px;''></td><td width='10px'><input " + getVotedCss(list[i]) + " type='image' class='song_entry up entry-" + i + " btn btn-success' src='static/img/up.png' style='margin-left:5px; margin-top:5px; width:40px; height: 30px'></td></tr><tr></a>" )
 
 			}
 
@@ -149,19 +152,22 @@
 			}
 		}
 
-		function updateFeedbackCount(negative_votes, positive_votes, changed_song_this_round) {
+		function updateFeedbackCount(negative_votes, positive_votes, provided_feedback_this_round, changed_song_this_round) {
 			$(".meh-count").html(negative_votes);
 			$(".woot-count").html(positive_votes);
-			if(changed_song_this_round) {
-				$(".feedback-woot").removeAttr("disabled");
-				$(".feedback-meh").removeAttr("disabled");
-				$.cookie('provided_feedback_this_round',false)
+
+			if (provided_feedback_this_round) {
+				console.log("entrou aqui tb foi?")
+				$(".feedback-woot").prop("disabled", true);
+				$(".feedback-meh").prop("disabled", true);
 			}
 
-			else if ($.cookie('provided_feedback_this_round') == "true") {
-				$(".feedback-woot").attr("disabled","disabled");
-				$(".feedback-meh").attr("disabled","disabled");
+			if (changed_song_this_round) {
+				console.log("entrou");
+				$(".feedback-woot").prop("disabled", false);
+				$(".feedback-meh").prop("disabled", false);
 			}
+
 		}
 
 		function getMarkCss(i) {
@@ -222,12 +228,9 @@
 				$.cookie('provided_feedback_this_round','false');
 			}
 
-			$(".name-panel").bPopup({
-			            speed: 650,
-			            transition: 'slideIn',
-				   		transitionClose: 'slideBack',
-				   		modalClose: false
-			        });
+			if (!$.cookie('provided_feedback_this_round')) {
+				$.cookie('provided_feedback_this_round','false');
+			}
 
 			$( ".btn-send-name" ).click(function() {
 				username = $(".username").val();
@@ -246,7 +249,7 @@
 				else {
 					alert("Por favor, forneça uma identificação")
 				}
-				
+
 			});
 
 			$(".song_entry").live("click", function (e) {
@@ -277,7 +280,6 @@
 	 					$(".woot-count").html(data["positive_votes"]);
 	 					$(".feedback-meh").attr("disabled","disabled");
 	 					$(".feedback-woot").attr("disabled","disabled");
-	 					$.cookie('provided_feedback_this_round',true)
 	  				}
 				});
 			});
@@ -294,7 +296,6 @@
 	 					$(".woot-count").html(data["positive_votes"]);
 	 					$(".feedback-meh").attr("disabled","disabled");
 	 					$(".feedback-woot").attr("disabled","disabled");
-	 					$.cookie('provided_feedback_this_round',true)
 	  				}
 				});
 			});
@@ -377,12 +378,23 @@
      			if (data.vote == 'none') {
      				enableLikeButtons()
      			}
+     			if (!data.current_user) {
+					$(".name-panel").bPopup({
+			            speed: 650,
+			            transition: 'slideIn',
+				   		transitionClose: 'slideBack',
+				   		modalClose: false,
+				   		escClose: false
+			        });
+				}
+				console.log("Mudou agora: " + data.changed_song_this_round);
+				console.log("Feedback dado: " + data.provided_feedback_this_round);
      			updateSatisfactionSmiley(data.satisfaction);
      			updateCurrentSong(data.current_song);
      			updateApplicantsTable(data.applicant_songs);
      			updateInfoBar(data.current_song);
      			updateOnlineUsers(data.online_users);
-     			updateFeedbackCount(data.negative_votes, data.positive_votes, data.changed_song_this_round);
+     			updateFeedbackCount(data.negative_votes, data.positive_votes, data.provided_feedback_this_round, data.changed_song_this_round);
    			};
 
    			$('#vote-textarea').autoResize({
@@ -418,8 +430,8 @@
             	<div id="info-bar">
             		<div style="position:fixed; left:0">
             			<img class="navbar-brand" src="static/img/playing.png" style="width:60px; height:60px; margin-top: -5px !important; margin-left: 10px;">
-	                	<a class="navbar-brand">Ouvindo agora:</a>
-	                	<a class="navbar-brand" id="current-song">Start Bootstrap</a>
+	                	<a class="navbar-brand" style="font-size: 20px !important; color: black !important; font-weight: bold">Ouvindo agora:</a>
+	                	<a class="navbar-brand" id="current-song" style="font-size: 20px !important">Start Bootstrap</a>
 	                	<a class="navbar-brand" id="current-player" style="font-weight: bold;font-size: 14px !important; margin-top: 10px !important; margin-left:-25px !important; color: white !important">por: felipe</a>
 	                	<input class="navbar-brand feedback-woot" type="image" title="Curti!" src="static/img/woot.png" style="width:60px; height:60px; margin-top: -5px !important;-webkit-appearance: none;"/>
 	                	<span class="badge navbar-brand woot-count" style="margin-left:-25px !important; margin-top:5px !important; font-size: 15px !important; height:20px !important;">15</span>
@@ -460,7 +472,7 @@
 
             </div>
 
-            <div id="player" style="visibility:hidden;">
+            <div id="player" style="visibility:hidden">
 			<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" bgcolor="#FFFFFF">
 				<param name="movie" value="static/ffmp3.swf" />
 				<param name="flashvars" value="url=http://{{server_url}}/ices&lang=en&codec=mp3&volume=100&traking=true&jsevents=true&autoplay=true&buffering=5&title=LSD+Radio" />
@@ -510,7 +522,7 @@
 			    <h3 class="panel-title">Escolha a próxima música!</h3>
 			  </div>
 
-			  <div class="list-group applicants_table">
+			  <div class="list-group applicants_table" style="max-height: 220px; overflow-y: auto">
 
 			</div>
 		</div>
@@ -531,15 +543,6 @@
 		    <h3 class="panel-title">Resultados de Busca</h3>
 		  </div>
 		  <div class="list-group lista-resultados">
-		    <a href="#" class="list-group-item item1" style="height:35px !important; border-color:grey !important;">Dapibus ac facilisis in</a>
-		  </div>
-	</div>
-
-	<div class="panel panel-primary"  id="online-users" style="width:200px;right: 0 !important;bottom: 0;position: absolute; margin-right:10px;border-color:#6c4a96 !important">
-		  <div class="panel-heading" style="background-color:#6c4a96 !important;border-color:#6c4a96 !important">
-		    <h3 class="panel-title">Usuários Online</h3>
-		  </div>
-		  <div class="list-group online-users" style="width: 200px !important;">
 		    <a href="#" class="list-group-item item1" style="height:35px !important; border-color:grey !important;">Dapibus ac facilisis in</a>
 		  </div>
 	</div>
