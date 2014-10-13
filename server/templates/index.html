@@ -111,10 +111,10 @@
 		}
 
 		function updateCurrentSong(song) {
-			if (song.length != "Sem musicas pra tocar") {
-				console.log(JSON.parse(song));
+			console.log(song)
+			if (song != "Sem musicas pra tocar") {
 				$('#current-song').html(JSON.parse(song).song);
-				$('#current-player').html(JSON.parse(song).author);
+				$('#current-player').html("por: " + JSON.parse(song).author);
 			}
 		}
 

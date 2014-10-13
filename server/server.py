@@ -26,7 +26,7 @@ KVSessionExtension(store, app)
 
 unlike_votes = []
 like_votes = []
-current_status = {'satisfaction' : 0.5, 'song': '', 'last_song':'', 'listeners': 0, "positive_votes":0, "negative_votes":0}
+current_status = {'satisfaction' : 0.5, 'listeners': 0, "positive_votes":0, "negative_votes":0}
 
 LISTENERS_IDX = 14
 PLAYING_IDX = 16
@@ -177,9 +177,11 @@ def status():
     active_songs = get_applicant_songs()
     active_songs.sort(key=lambda Song: Song.balance, reverse=True)
     update_file(active_songs)
-    session['song'] = get_current_song()
-    SUGGESTION_LOGGER.info("Aqui o atual: " + session['song'])
-    SUGGESTION_LOGGER.info("Aqui o antigo: " + session['song'])
+    if (len(ice_status()) <= PLAYING_IDX + 1):
+        session['song'] = "Sem musicas pra tocar"
+    else:
+        session['song'] = get_current_song()
+
     if (session['song'] != session['last_song']):
         session['last_song'] = session['song']
         session['provided_feedback_this_round'] = False
@@ -189,7 +191,7 @@ def status():
     else:
         changed_song_this_round = False
     token = request.cookies.get('token')
-    return simplejson.dumps({"vote": get_vote(token), "current_song": current_status['song'],
+    return simplejson.dumps({"vote": get_vote(token), "current_song": session["song"],
                              "satisfaction": current_status['satisfaction'], "applicant_songs": get_applicant_titles(), "online_users": get_online_users(),
                              "positive_votes": current_status["positive_votes"], "negative_votes": current_status["negative_votes"],
                              "provided_feedback_this_round":session["provided_feedback_this_round"], "changed_song_this_round": changed_song_this_round,
@@ -220,6 +222,22 @@ def index():
 
     def id_generator(size=8, chars=string.ascii_letters + string.digits):
         return ''.join(random.choice(chars) for x in range(size))
+
+
+    try:
+        a = session['song']
+    except:
+        session['song'] = ''
+
+    try:
+        a = session['provided_feedback_this_round']
+    except:
+        session['provided_feedback_this_round'] = False
+
+    try:
+        a = session['last_song']
+    except:
+        session['last_song'] = ''
 
     token = request.cookies.get('token')
     vote = get_vote(token)
@@ -328,13 +346,13 @@ def reset_ping_file():
         time.sleep(30)
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO, format='%(levelname)-8s %(message)s')
+    app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+    app.run(host='0.0.0.0')
+
     th=Thread(target=check_newsong)
     th.start()
     update_status()
 
-    logging.basicConfig(level=logging.INFO, format='%(levelname)-8s %(message)s')
-    app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
-    app.run(host='0.0.0.0')
-    session["provided_feedback_this_round"] = False
-    session["song"] = ''
-    session["last_song"] = ''
+
+
