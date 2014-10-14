@@ -71,6 +71,7 @@
   				dataType: "json",
   				data: JSON.stringify({'index': selectedIndex}, null, '\t'),
  				success: function(data){
+ 					console.log("Retorno: " + data);
  					response = jQuery.parseJSON(data);
  					if (response.error) {
  						alert("Essa música já foi pedida recentemente! Tente outra sugestão");
