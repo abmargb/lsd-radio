@@ -105,10 +105,25 @@ def perform_vote():
     index = request.json["index"]
     item = session["current_results"]['data']['items'][int(index)]
     video_json = simplejson.dumps({"id": item['id'], "title": item['title'], "user" : session["current_user"].rstrip()})
+    last_requests = get_last_requests()
+    SUGGESTION_LOGGER.info(last_requests)
+    if item['id'] in last_requests:
+        return simplejson.dumps('{"error": "Already requested"}')
+    with open('last_requests', 'a') as the_file:
+        the_file.write('%s\n' % item['id'])
     radio_utils.append(radio_utils.get_path(RADIO_ROOT, 'to_process_votes'),
                           video_json)
     SUGGESTION_LOGGER.info("%s | %s" % (session["current_user"], item['title'].rstrip()))
     return simplejson.dumps(current_status)
+
+def get_last_requests():
+    requests = []
+    file_requests = open('last_requests','r')
+    for request in file_requests.readlines():
+        if len(request) > 1:
+            requests.append(request.strip())
+    file_requests.close()
+    return requests
 
 @app.route('/vote_song', methods= ["POST"])
 def vote_song():
@@ -290,16 +305,16 @@ def get_applicant_songs():
     applicants = []
     for song in songs.readlines():
         unpickled = jsonpickle.decode(song)
-        song = Song(unpickled["id"], unpickled["title"], unpickled["user"])
-        song.up_votes = unpickled["up_votes"]
-        song.down_votes = unpickled["down_votes"]
-        song.balance = song.up_votes - song.down_votes
-        song.path = unpickled["path"]
-        #song = Song(unpickled.id, unpickled.title, unpickled.user)
-        #song.up_votes = unpickled.up_votes
-        #song.down_votes = unpickled.down_votes
+        #song = Song(unpickled["id"], unpickled["title"], unpickled["user"])
+        #song.up_votes = unpickled["up_votes"]
+        #song.down_votes = unpickled["down_votes"]
         #song.balance = song.up_votes - song.down_votes
-        #song.path = unpickled.path
+        #song.path = unpickled["path"]
+        song = Song(unpickled.id, unpickled.title, unpickled.user)
+        song.up_votes = unpickled.up_votes
+        song.down_votes = unpickled.down_votes
+        song.balance = song.up_votes - song.down_votes
+        song.path = unpickled.path
         applicants.append(song)
     songs.close()
     return applicants

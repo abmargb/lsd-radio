@@ -71,7 +71,10 @@
   				dataType: "json",
   				data: JSON.stringify({'index': selectedIndex}, null, '\t'),
  				success: function(data){
-
+ 					response = jQuery.parseJSON(data);
+ 					if (response.error) {
+ 						alert("Essa música já foi pedida recentemente! Tente outra sugestão");
+ 					}
   				}
 			});
 
@@ -111,7 +114,6 @@
 		}
 
 		function updateCurrentSong(song) {
-			console.log(song)
 			if (song != "Sem musicas pra tocar") {
 				$('#current-song').html(JSON.parse(song).song);
 				$('#current-player').html("por: " + JSON.parse(song).author);
@@ -157,13 +159,11 @@
 			$(".woot-count").html(positive_votes);
 
 			if (provided_feedback_this_round) {
-				console.log("entrou aqui tb foi?")
 				$(".feedback-woot").prop("disabled", true);
 				$(".feedback-meh").prop("disabled", true);
 			}
 
 			if (changed_song_this_round) {
-				console.log("entrou");
 				$(".feedback-woot").prop("disabled", false);
 				$(".feedback-meh").prop("disabled", false);
 			}
@@ -387,8 +387,6 @@
 				   		escClose: false
 			        });
 				}
-				console.log("Mudou agora: " + data.changed_song_this_round);
-				console.log("Feedback dado: " + data.provided_feedback_this_round);
      			updateSatisfactionSmiley(data.satisfaction);
      			updateCurrentSong(data.current_song);
      			updateApplicantsTable(data.applicant_songs);
