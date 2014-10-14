@@ -1,0 +1,1 @@
+2014-10-09 17:36:26,778 | FFMPEG Conversion: youtube-dl http://www.youtube.com/watch?v=qmOvUl2Pws0 -q -o /dev/stdout | ffmpeg -i pipe: -acodec libmp3lame -vn -ab 128000 -ar 44100 /home/felipe/workspace/lsd-radio/cache/"qmOvUl2Pws0".mp3

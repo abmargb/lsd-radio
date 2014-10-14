@@ -15,5 +15,5 @@ while True:
 	vote_json_str = radio_utils.poll(real_path('to_process_votes'))
 	if vote_json_str:
 		print 'python %s/conversion_script.py %s "%s" %s &' % (ICES_MODULE_ROOT, simplejson.loads(vote_json_str)["id"], simplejson.loads(vote_json_str)["title"].encode("UTF-8"),simplejson.loads(vote_json_str)["user"].encode("UTF-8"))
-		os.system('python %s/conversion_script.py %s "%s" %s &' % (ICES_MODULE_ROOT, simplejson.loads(vote_json_str)["id"], simplejson.loads(vote_json_str)["title"].encode("UTF-8"),simplejson.loads(vote_json_str)["user"].encode("UTF-8")))  
+		os.system('python %s/conversion_script.py %s "%s" %s &' % (ICES_MODULE_ROOT, simplejson.loads(vote_json_str)["id"], simplejson.loads(vote_json_str)["title"].encode("UTF-8"),simplejson.loads(vote_json_str)["user"].encode("UTF-8")))
 	time.sleep(5)
