@@ -181,8 +181,8 @@ def update_satisfaction():
     satisfaction = (satisfaction + 1) / 2
 
     unpickled = jsonpickle.decode(check_widgets())
-    skip_on = unpickled["interpose"]
-
+    #skip_on = unpickled["interpose"]
+    skip_on = unpickled.interpose
     if (satisfaction < 0.25 and skip_on):
         # Quem foi vetado, Quando foi vetado (Extrair quantas vezes foi vetado)
         INTERPOSE_LOGGER.info("%s" % (session["current_user"]))
@@ -307,16 +307,16 @@ def get_applicant_songs():
     applicants = []
     for song in songs.readlines():
         unpickled = jsonpickle.decode(song)
-        song = Song(unpickled["id"], unpickled["title"], unpickled["user"])
-        song.up_votes = unpickled["up_votes"]
-        song.down_votes = unpickled["down_votes"]
-        song.balance = song.up_votes - song.down_votes
-        song.path = unpickled["path"]
-        #song = Song(unpickled.id, unpickled.title, unpickled.user)
-        #song.up_votes = unpickled.up_votes
-        #song.down_votes = unpickled.down_votes
+        #song = Song(unpickled["id"], unpickled["title"], unpickled["user"])
+        #song.up_votes = unpickled["up_votes"]
+        #song.down_votes = unpickled["down_votes"]
         #song.balance = song.up_votes - song.down_votes
-        #song.path = unpickled.path
+        #song.path = unpickled["path"]
+        song = Song(unpickled.id, unpickled.title, unpickled.user)
+        song.up_votes = unpickled.up_votes
+        song.down_votes = unpickled.down_votes
+        song.balance = song.up_votes - song.down_votes
+        song.path = unpickled.path
         applicants.append(song)
     songs.close()
     return applicants
