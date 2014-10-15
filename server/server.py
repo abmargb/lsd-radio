@@ -180,7 +180,10 @@ def update_satisfaction():
     satisfaction = float(current_status["positive_votes"] - current_status["negative_votes"]) / float(max(listeners,1))
     satisfaction = (satisfaction + 1) / 2
 
-    if (satisfaction < 0.25):
+    unpickled = jsonpickle.decode(check_widgets())
+    skip_on = unpickled["interpose"]
+
+    if (satisfaction < 0.25 and skip_on):
         # Quem foi vetado, Quando foi vetado (Extrair quantas vezes foi vetado)
         INTERPOSE_LOGGER.info("%s" % (session["current_user"]))
         skip_song()
@@ -209,7 +212,7 @@ def status():
                              "satisfaction": current_status['satisfaction'], "applicant_songs": get_applicant_titles(), "online_users": get_online_users(),
                              "positive_votes": current_status["positive_votes"], "negative_votes": current_status["negative_votes"],
                              "provided_feedback_this_round":session["provided_feedback_this_round"], "changed_song_this_round": changed_song_this_round,
-                             "current_user":session.get("current_user", False)})
+                             "current_user":session.get("current_user", False), "widgets":check_widgets()})
 
 @app.route('/like')
 def like():
@@ -304,16 +307,16 @@ def get_applicant_songs():
     applicants = []
     for song in songs.readlines():
         unpickled = jsonpickle.decode(song)
-        #song = Song(unpickled["id"], unpickled["title"], unpickled["user"])
-        #song.up_votes = unpickled["up_votes"]
-        #song.down_votes = unpickled["down_votes"]
-        #song.balance = song.up_votes - song.down_votes
-        #song.path = unpickled["path"]
-        song = Song(unpickled.id, unpickled.title, unpickled.user)
-        song.up_votes = unpickled.up_votes
-        song.down_votes = unpickled.down_votes
+        song = Song(unpickled["id"], unpickled["title"], unpickled["user"])
+        song.up_votes = unpickled["up_votes"]
+        song.down_votes = unpickled["down_votes"]
         song.balance = song.up_votes - song.down_votes
-        song.path = unpickled.path
+        song.path = unpickled["path"]
+        #song = Song(unpickled.id, unpickled.title, unpickled.user)
+        #song.up_votes = unpickled.up_votes
+        #song.down_votes = unpickled.down_votes
+        #song.balance = song.up_votes - song.down_votes
+        #song.path = unpickled.path
         applicants.append(song)
     songs.close()
     return applicants
@@ -352,6 +355,12 @@ def check_newsong():
 
         time.sleep(2)
         update_song()
+
+def check_widgets():
+    widget_file = open("mechanism_control","r")
+    content = widget_file.read()
+    widget_file.close()
+    return content
 
 def reset_ping_file():
     while (True):

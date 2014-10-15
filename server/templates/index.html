@@ -172,6 +172,40 @@
 
 		}
 
+		function updateWidgets(status) {
+			if(status.feedback) {
+				$(".feedback-woot").css("display", "inline");
+				$(".woot-count").css("display", "inline");
+				$(".feedback-meh").css("display", "inline");
+				$(".meh-count").css("display", "inline");
+			}
+
+			else {
+				$(".feedback-woot").css("display", "none");
+				$(".woot-count").css("display", "none");
+				$(".feedback-meh").css("display", "none");
+				$(".meh-count").css("display", "none");
+			}
+
+			if (status.queue) {
+				$(".song_entry").css("display", "inline");
+				$('.title-queue').html("Escolha a próxima música")
+			}
+
+			else {
+				$(".song_entry").css("display", "none");
+				$('.title-queue').html("Próximas músicas")
+			}
+
+			if (status.satisfaction) {
+				$("#widget-satisfaction").css("visibility", "visible");
+			}
+
+			else {
+				$("#widget-satisfaction").css("visibility", "hidden");
+			}
+		}
+
 		function getMarkCss(i) {
 			if (i == 0) {
 				return "active";
@@ -223,7 +257,7 @@
 				var date = new Date();
 				var minutes = 30;
 				date.setTime(date.getTime() + (minutes * 60 * 1000));
-				$.cookie('votedSongs',"", { expires: date });
+				$.cookie('votedSongs',"", {domain: '', path: '' });
 			}
 
 			if (!$.cookie('provided_feedback_this_round')) {
@@ -395,6 +429,7 @@
      			updateInfoBar(data.current_song);
      			updateOnlineUsers(data.online_users);
      			updateFeedbackCount(data.negative_votes, data.positive_votes, data.provided_feedback_this_round, data.changed_song_this_round);
+     			updateWidgets(jQuery.parseJSON(data.widgets))
    			};
 
    			$('#vote-textarea').autoResize({
@@ -519,7 +554,7 @@
 		<center style="margin-top: 50px">
 		<div class="panel panel-primary"  style="width: 500px !important;border-color:#6c4a96 !important">
 			  <div class="panel-heading" style="background-color:#6c4a96 !important;border-color:#6c4a96 !important">
-			    <h3 class="panel-title">Escolha a próxima música!</h3>
+			    <h3 class="panel-title title-queue">Escolha a próxima música!</h3>
 			  </div>
 
 			  <div class="list-group applicants_table" style="max-height: 220px; overflow-y: auto">
