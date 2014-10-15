@@ -116,7 +116,8 @@
 
 		function updateCurrentSong(song) {
 			if (song != "Sem musicas pra tocar") {
-				$('#current-song').html(JSON.parse(song).song);
+				songText = JSON.parse(song).song
+				$('#current-song').html(songText.length < 80 ? songText : songText.substring(0,79) + "...");
 				$('#current-player').html("por: " + JSON.parse(song).author);
 			}
 		}

@@ -106,7 +106,6 @@ def perform_vote():
     item = session["current_results"]['data']['items'][int(index)]
     video_json = simplejson.dumps({"id": item['id'], "title": item['title'], "user" : session["current_user"].rstrip()})
     last_requests = get_last_requests()
-    SUGGESTION_LOGGER.info(last_requests)
     if item['id'] in last_requests:
         return simplejson.dumps('{"error": "Already requested"}')
     with open('last_requests', 'a') as the_file:
@@ -149,7 +148,6 @@ def feedback():
     else:
         current_status["negative_votes"] += 1
     # Quem deu feedback, como deu, quando deu
-    FEEDBACK_LOGGER.info("%s | %s" % (session["current_user"].rstrip(), feedback_type.rstrip()))
     session["provided_feedback_this_round"] = True
     update_satisfaction()
     return simplejson.dumps(current_status)
@@ -178,12 +176,13 @@ def update_satisfaction():
         os.system("echo 'kill -SIGUSR1 %s' > kill_; bash kill_; rm kill_;" % pid)
         f.close()
 
-    satisfaction = float(current_status["positive_votes"] - current_status["negative_votes"]) / float(max(len(get_online_users()),1))
+    listeners = current_status['listeners']
+    satisfaction = float(current_status["positive_votes"] - current_status["negative_votes"]) / float(max(listeners,1))
     satisfaction = (satisfaction + 1) / 2
 
     if (satisfaction < 0.25):
         # Quem foi vetado, Quando foi vetado (Extrair quantas vezes foi vetado)
-        INTERPOSE_LOGGER.info("%s" % (get_current_player()))
+        INTERPOSE_LOGGER.info("%s" % (session["current_user"]))
         skip_song()
 
 @app.route('/status')
