@@ -148,6 +148,7 @@ def feedback():
     else:
         current_status["negative_votes"] += 1
     # Quem deu feedback, como deu, quando deu
+    FEEDBACK_LOGGER.info("%s | %s" % (session["current_user"].rstrip(), feedback_type.rstrip()))
     session["provided_feedback_this_round"] = True
     update_satisfaction()
     return simplejson.dumps(current_status)
@@ -181,8 +182,7 @@ def update_satisfaction():
     satisfaction = (satisfaction + 1) / 2
 
     unpickled = jsonpickle.decode(check_widgets())
-    #skip_on = unpickled["interpose"]
-    skip_on = unpickled.interpose
+    skip_on = unpickled["interpose"]
     if (satisfaction < 0.25 and skip_on):
         # Quem foi vetado, Quando foi vetado (Extrair quantas vezes foi vetado)
         INTERPOSE_LOGGER.info("%s" % (session["current_user"]))
