@@ -355,7 +355,7 @@ def check_newsong():
         update_song()
 
 def check_widgets():
-    widget_file = open("mechanism_control","r")
+    widget_file = open("/home/ubuntu/workspace/lsd-radio/mechanism_control","r")
     content = widget_file.read()
     widget_file.close()
     return content
