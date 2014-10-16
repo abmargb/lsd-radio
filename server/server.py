@@ -239,12 +239,10 @@ def index():
 
     def id_generator(size=8, chars=string.ascii_letters + string.digits):
         return ''.join(random.choice(chars) for x in range(size))
-
-
     try:
         a = session['song']
     except:
-        session['song'] = ''
+        session['song'] = get_current_song()
 
     try:
         a = session['provided_feedback_this_round']
@@ -254,7 +252,7 @@ def index():
     try:
         a = session['last_song']
     except:
-        session['last_song'] = ''
+        session['last_song'] = get_current_song()
 
     token = request.cookies.get('token')
     vote = get_vote(token)
