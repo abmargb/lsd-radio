@@ -367,13 +367,14 @@ def reset_ping_file():
         time.sleep(30)
 
 if __name__ == '__main__':
+    th=Thread(target=check_newsong)
+    th.start()
+    update_status()
+
     logging.basicConfig(level=logging.INFO, format='%(levelname)-8s %(message)s')
     app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
     app.run(host='0.0.0.0')
 
-    th=Thread(target=check_newsong)
-    th.start()
-    update_status()
 
 
 
